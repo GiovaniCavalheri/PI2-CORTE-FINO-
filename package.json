@@ -1,31 +1,28 @@
 {
-  "name": "pi-corte-fino-rfc",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^7.3.1"
-  },
-  "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.8"
-  },
+  "name": "pi2-corte-fino-",
+  "version": "1.0.0",
   "description": "Padrão de trabalho em equipe para o repositório [PI-CORTE-FINO-REFAT](https://github.com/GiovaniCavalheri/PI-CORTE-FINO-REFAT).",
-  "main": "index.js",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GiovaniCavalheri/PI-CORTE-FINO-REFAT.git"
+    "url": "git+https://github.com/GiovaniCavalheri/PI2-CORTE-FINO-.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/GiovaniCavalheri/PI-CORTE-FINO-REFAT/issues"
+    "url": "https://github.com/GiovaniCavalheri/PI2-CORTE-FINO-/issues"
   },
-  "homepage": "https://github.com/GiovaniCavalheri/PI-CORTE-FINO-REFAT#readme"
+  "homepage": "https://github.com/GiovaniCavalheri/PI2-CORTE-FINO-#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "ejs": "^7.0.1",
+    "ejs-layout": "^1.0.15",
+    "express": "^5.2.1",
+    "express-ejs-layouts": "^2.5.1",
+    "multer": "^2.4.0",
+    "mysql2": "^3.24.5"
+  }
 }

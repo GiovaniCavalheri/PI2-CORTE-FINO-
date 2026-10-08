@@ -388,10 +388,7 @@
   </head>
   <body>
     <!-- HEADER -->
-    <header>
-      <a href="/" class="header-logo">Corte Fino</a>
-      <a href="/" class="btn-voltar">← Continuar comprando</a>
-    </header>
+    <%- include("partials/header", { currentPage: "cart" }) %>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="container-carrinho">

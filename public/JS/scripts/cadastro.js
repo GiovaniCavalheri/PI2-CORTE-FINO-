@@ -548,7 +548,7 @@ function mostrarSucesso() {
   document.body.appendChild(div);
 
   setTimeout(function () {
-    window.location.href = "/index.html";
+    window.location.href = "/";
   }, 2500);
 }
 

@@ -372,12 +372,6 @@ function validarCadastro(event, tipoForm) {
       marcarValido(inputRG);
     }
 
-    // Estado civil: obrigatório
-    if (!form.querySelector("input[name='estadoCivil']:checked")) {
-      document.querySelector("#erroEstadoCivil").textContent =
-        "Selecione o estado civil.";
-      valido = false;
-    }
 
     if (!validaEmail(document.querySelector("#emailSocio"))) valido = false;
     if (!validaTelefone(document.querySelector("#CelularSocio")))
@@ -528,7 +522,7 @@ function validarCadastro(event, tipoForm) {
 
 function mostrarSucesso() {
   let div = document.createElement("div");
-  div.textContent = "✓ Cadastro realizado com sucesso! Redirecionando...";
+  div.textContent = "✓ Cadastro realizado com sucesso! Redirecionando para o login...";
   div.style.cssText = `
     position: fixed;
     top: 30px;
@@ -548,7 +542,7 @@ function mostrarSucesso() {
   document.body.appendChild(div);
 
   setTimeout(function () {
-    window.location.href = "/";
+    window.location.href = "/join";
   }, 2500);
 }
 

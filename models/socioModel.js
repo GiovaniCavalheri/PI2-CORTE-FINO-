@@ -1,55 +1,14 @@
+const Database = require("../database/database");
+
 class Socio {
   #id;
-  #nome;
-  #dataNasc;
-  #cpf;
-  #rg;
-  #estadoCivil;
-  #email;
-  #celular;
-  #telComercial;
-  #cep;
-  #cidade;
-  #estado;
-  #bairro;
-  #numResidencia;
-  #complemento;
-  #senha;
+  #dataAdesao;
+  #dataVencimento;
 
-  constructor(
-    id,
-    nome,
-    dataNasc,
-    cpf,
-    rg,
-    estadoCivil,
-    email,
-    celular,
-    telComercial,
-    cep,
-    cidade,
-    estado,
-    bairro,
-    numResidencia,
-    complemento,
-    senha,
-  ) {
+  constructor(id, dataAdesao, dataVencimento) {
     this.#id = id;
-    this.#nome = nome;
-    this.#dataNasc = dataNasc;
-    this.#cpf = cpf;
-    this.#rg = rg;
-    this.#estadoCivil = estadoCivil;
-    this.#email = email;
-    this.#celular = celular;
-    this.#telComercial = telComercial;
-    this.#cep = cep;
-    this.#cidade = cidade;
-    this.#estado = estado;
-    this.#bairro = bairro;
-    this.#numResidencia = numResidencia;
-    this.#complemento = complemento;
-    this.#senha = senha;
+    this.#dataAdesao = dataAdesao;
+    this.#dataVencimento = dataVencimento;
   }
 
   get id() {
@@ -59,112 +18,71 @@ class Socio {
     this.#id = valor;
   }
 
-  get nome() {
-    return this.#nome;
+  get dataAdesao() {
+    return this.#dataAdesao;
   }
-  set nome(valor) {
-    this.#nome = valor;
-  }
-
-  get dataNasc() {
-    return this.#dataNasc;
-  }
-  set dataNasc(valor) {
-    this.#dataNasc = valor;
+  set dataAdesao(valor) {
+    this.#dataAdesao = valor;
   }
 
-  get cpf() {
-    return this.#cpf;
+  get dataVencimento() {
+    return this.#dataVencimento;
   }
-  set cpf(valor) {
-    this.#cpf = valor;
-  }
-
-  get rg() {
-    return this.#rg;
-  }
-  set rg(valor) {
-    this.#rg = valor;
+  set dataVencimento(valor) {
+    this.#dataVencimento = valor;
   }
 
-  get estadoCivil() {
-    return this.#estadoCivil;
-  }
-  set estadoCivil(valor) {
-    this.#estadoCivil = valor;
+  async cadastrar() {
+    let sql =
+      "insert into SOCIO (ID_SOCIO, DATA_ADESAO, DATA_VENCIMENTO) values (?,?,?)";
+    let valores = [this.#id, this.#dataAdesao, this.#dataVencimento];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
   }
 
-  get email() {
-    return this.#email;
-  }
-  set email(valor) {
-    this.#email = valor;
+  async excluir(id) {
+    let sql = "delete from SOCIO where ID_SOCIO = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
   }
 
-  get celular() {
-    return this.#celular;
-  }
-  set celular(valor) {
-    this.#celular = valor;
+  async listar() {
+    let sql = "select * from SOCIO";
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql);
+
+    let lista = [];
+    for (let i = 0; i < linhas.length; i++) {
+      let linha = linhas[i];
+      let socio = new Socio(
+        linha["ID_SOCIO"],
+        linha["DATA_ADESAO"],
+        linha["DATA_VENCIMENTO"],
+      );
+
+      lista.push(socio);
+    }
+    return lista;
   }
 
-  get telComercial() {
-    return this.#telComercial;
-  }
-  set telComercial(valor) {
-    this.#telComercial = valor;
-  }
+  async alterar() {
+    let sql =
+      "update SOCIO set DATA_ADESAO = ?, DATA_VENCIMENTO = ? where ID_SOCIO = ?";
+    let valores = [this.#dataAdesao, this.#dataVencimento, this.#id];
 
-  get cep() {
-    return this.#cep;
-  }
-  set cep(valor) {
-    this.#cep = valor;
-  }
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
 
-  get cidade() {
-    return this.#cidade;
-  }
-  set cidade(valor) {
-    this.#cidade = valor;
-  }
-
-  get estado() {
-    return this.#estado;
-  }
-  set estado(valor) {
-    this.#estado = valor;
-  }
-
-  get bairro() {
-    return this.#bairro;
-  }
-  set bairro(valor) {
-    this.#bairro = valor;
-  }
-
-  get numResidencia() {
-    return this.#numResidencia;
-  }
-  set numResidencia(valor) {
-    this.#numResidencia = valor;
-  }
-
-  get complemento() {
-    return this.#complemento;
-  }
-  set complemento(valor) {
-    this.#complemento = valor;
-  }
-
-  set senha(valor) {
-    this.#senha = valor;
-  }
-
-  verificarSenha(senhaDigitada) {
-    return this.#senha === senhaDigitada;
+    return result;
   }
 }
 
-
-module.exports = Socio
+module.exports = Socio;

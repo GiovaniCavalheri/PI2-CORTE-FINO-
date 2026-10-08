@@ -286,7 +286,7 @@ function validaSenha(inputSenha, inputConfirma) {
   return valido;
 }
 
-function validarCadastro(event, tipoForm) {
+async function validarCadastro(event, tipoForm) {
   event.preventDefault();
 
   let form = document.querySelector(
@@ -507,7 +507,110 @@ function validarCadastro(event, tipoForm) {
       valido = false;
   }
 
-  if (valido) mostrarSucesso();
+  if (valido) {
+    await enviarCadastro(tipoForm);
+  }
+}
+
+async function enviarCadastro(tipoForm) {
+  const botao = document.querySelector(
+    tipoForm === "socio" ? "#formSocio button[type='submit']" : "#formFornecedor button[type='submit']",
+  );
+  botao.disabled = true;
+
+  try {
+    if (tipoForm === "socio") {
+      const usuario = {
+        cpfCliente: document.querySelector("#CPF").value.trim(),
+        emailCliente: document.querySelector("#emailSocio").value.trim(),
+        enderecoCliente: [
+          document.querySelector("#BairroSocio").value.trim(),
+          document.querySelector("#CidadeSocio").value.trim(),
+          document.querySelector("#EstadoSocio").value.trim(),
+          document.querySelector("#CEPSocio").value.trim(),
+          document.querySelector("#numberRedSocio").value.trim(),
+          document.querySelector("#ComplementoSocio").value.trim(),
+        ]
+          .filter(Boolean)
+          .join(", "),
+        telefone: document.querySelector("#CelularSocio").value.trim(),
+        telComercial: document.querySelector("#TelefoneSocio").value.trim(),
+      };
+
+      const cadastroUsuario = await enviarJson("/usuario/cadastrar", usuario);
+      if (!cadastroUsuario.ok || !cadastroUsuario.id) {
+        throw new Error("Não foi possível cadastrar os dados do usuário.");
+      }
+
+      const dataAdesao = new Date();
+      const dataVencimento = new Date(dataAdesao);
+      dataVencimento.setDate(dataVencimento.getDate() + 30);
+
+      try {
+        const cadastroSocio = await enviarJson("/socio/cadastrar", {
+          id: cadastroUsuario.id,
+          dataAdesao: formatarDataLocal(dataAdesao),
+          dataVencimento: formatarDataLocal(dataVencimento),
+        });
+        if (!cadastroSocio.ok) {
+          throw new Error("Não foi possível concluir o cadastro de sócio.");
+        }
+      } catch (erro) {
+        const exclusaoUsuario = await fetch(
+          `/usuario/excluir/${encodeURIComponent(cadastroUsuario.id)}`,
+          { method: "DELETE" },
+        );
+        const resultadoExclusao = exclusaoUsuario.ok
+          ? await exclusaoUsuario.json()
+          : { ok: false };
+        if (!resultadoExclusao.ok) {
+          throw new Error(
+            "O cadastro de sócio falhou e não foi possível remover o usuário criado.",
+          );
+        }
+        throw erro;
+      }
+    } else {
+      const resultado = await enviarJson("/fornecedor/cadastrar", {
+        cnpjFornecedor: document.querySelector("#CNPJ").value.trim(),
+        nomeFornecedor: document.querySelector("#razaosocial").value.trim(),
+        emailFornecedor: document
+          .querySelector("#emailFornecedor")
+          .value.trim(),
+        telefone: document
+          .querySelector("#TelefoneComercialFornecedor")
+          .value.trim(),
+      });
+      if (!resultado.ok) {
+        throw new Error("Não foi possível cadastrar o fornecedor.");
+      }
+    }
+
+    mostrarSucesso();
+  } catch (erro) {
+    alert(erro.message || "Não foi possível concluir o cadastro. Tente novamente.");
+  } finally {
+    botao.disabled = false;
+  }
+}
+
+function formatarDataLocal(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const dia = String(data.getDate()).padStart(2, "0");
+  return `${ano}-${mes}-${dia}`;
+}
+
+async function enviarJson(url, dados) {
+  const resposta = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dados),
+  });
+  if (!resposta.ok) {
+    throw new Error(`Falha na requisição (${resposta.status}).`);
+  }
+  return resposta.json();
 }
 
 function mostrarSucesso() {

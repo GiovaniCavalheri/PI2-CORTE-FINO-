@@ -83,6 +83,21 @@ class Cliente {
     return result;
   }
 
+  async cadastrarComId() {
+    let sql =
+      "insert into CLIENTE (CPF_CLIENTE, EMAIL_CLIENTE, ENDERECO_CLIENTE, TELEFONE, TEL_COMERCIAL) values (?,?,?,?,?)";
+    let valores = [
+      this.#cpfCliente,
+      this.#emailCliente,
+      this.#enderecoCliente,
+      this.#telefone,
+      this.#telComercial,
+    ];
+
+    let banco = new Database();
+    return banco.ExecutaComandoLastInserted(sql, valores);
+  }
+
   async excluir(id) {
     let sql = "delete from CLIENTE where ID_CLIENTE = ?";
     let valores = [id];

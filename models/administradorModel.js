@@ -64,7 +64,7 @@ class Administrador {
   }
 
   async listar() {
-    let sql = "select * from ADMINISTRADOR";
+    let sql = "select ID_ADM, NOME_ADM, EMAIL_ADM from ADMINISTRADOR";
 
     let banco = new Database();
     let linhas = await banco.ExecutaComando(sql);

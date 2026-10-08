@@ -984,21 +984,21 @@
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
             <div>
-              <div class="stat-value"><%= produtos.length %></div>
+              <div class="stat-value" id="totalProdutos"><%= produtos.length %></div>
               <div class="stat-label">Produtos cadastrados</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
             <div>
-              <div class="stat-value"><%= categorias.length %></div>
+              <div class="stat-value" id="totalCategorias"><%= categorias.length %></div>
               <div class="stat-label">Categorias cadastradas</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-tag"></i></div>
             <div>
-              <div class="stat-value"><%= marcas.length %></div>
+              <div class="stat-value" id="totalMarcas"><%= marcas.length %></div>
               <div class="stat-label">Marcas cadastradas</div>
             </div>
           </div>
@@ -1151,7 +1151,7 @@
                 <th style="width: 110px">Acoes</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="listaProdutos">
               <% if (produtos.length == 0) { %>
               <tr>
                 <td colspan="6">
@@ -1206,6 +1206,7 @@
         </div>
 
         <div class="form-card">
+          <input type="hidden" id="idCategoria" value="" />
           <div class="form-row cols-2">
             <div>
               <label class="form-label">Nome da Categoria *</label>
@@ -1236,7 +1237,7 @@
                 <th style="width: 80px">Acoes</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="listaCategorias">
               <% if (categorias.length == 0) { %>
               <tr>
                 <td colspan="3">
@@ -1252,6 +1253,14 @@
                 <td><%= categorias[i].nomeCategoria %></td>
                 <td><%= categorias[i].descricao %></td>
                 <td>
+                  <button
+                    class="btn-outline btnEditarCategoria"
+                    data-id="<%= categorias[i].id %>"
+                    data-nome="<%= categorias[i].nomeCategoria %>"
+                    data-descricao="<%= categorias[i].descricao %>"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
                   <button
                     class="btn-danger btnExcluirCategoria"
                     data-id="<%= categorias[i].id %>"
@@ -1272,6 +1281,7 @@
         </div>
 
         <div class="form-card">
+          <input type="hidden" id="idMarca" value="" />
           <div class="form-row">
             <div>
               <label class="form-label">Nome da Marca *</label>
@@ -1293,7 +1303,7 @@
                 <th style="width: 80px">Acoes</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="listaMarcas">
               <% if (marcas.length == 0) { %>
               <tr>
                 <td colspan="2">
@@ -1308,6 +1318,13 @@
               <tr>
                 <td><%= marcas[i].nomeMarca %></td>
                 <td>
+                  <button
+                    class="btn-outline btnEditarMarca"
+                    data-id="<%= marcas[i].id %>"
+                    data-nome="<%= marcas[i].nomeMarca %>"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
                   <button
                     class="btn-danger btnExcluirMarca"
                     data-id="<%= marcas[i].id %>"
@@ -1335,7 +1352,6 @@
               id="uploadRelatorio"
               accept="image/*"
               style="display: none"
-              onchange="adicionarRelatorio(this)"
             />
           </label>
         </div>
@@ -1382,318 +1398,6 @@
     </div>
     <!-- /main -->
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // ──────────────────────────────────────────────
-        // SIDEBAR
-        // ──────────────────────────────────────────────
-        document
-          .querySelector("#toggleSidebar")
-          .addEventListener("click", function () {
-            var sidebar = document.querySelector("#sidebar");
-            var main = document.querySelector("#main");
-
-            if (window.innerWidth <= 768) {
-              sidebar.classList.toggle("open");
-            } else {
-              sidebar.classList.toggle("collapsed");
-              main.classList.toggle("expanded");
-            }
-          });
-
-        // ──────────────────────────────────────────────
-        // NAVEGACAO ENTRE AS SECOES
-        // ──────────────────────────────────────────────
-        var titulos = {
-          dashboard: "Painel",
-          produtos: "Produtos",
-          cadastros: "Categorias e Marcas",
-          relatorios: "Relatorios",
-        };
-
-        function navigateTo(secao) {
-          document.querySelectorAll(".page-content").forEach(function (el) {
-            el.classList.remove("active");
-          });
-          document.querySelectorAll(".nav-link-cf").forEach(function (el) {
-            el.classList.remove("active");
-          });
-          document.querySelector("#section-" + secao).classList.add("active");
-          document
-            .querySelector('[data-section="' + secao + '"]')
-            .classList.add("active");
-          document.querySelector("#topbarTitle").textContent = titulos[secao];
-        }
-
-        // deixa a funcao disponivel para os botoes de acesso rapido
-        window.navigateTo = navigateTo;
-
-        document.querySelectorAll(".nav-link-cf").forEach(function (link) {
-          link.addEventListener("click", function (e) {
-            e.preventDefault();
-            navigateTo(this.getAttribute("data-section"));
-          });
-        });
-
-        // ──────────────────────────────────────────────
-        // PRODUTOS - GRAVAR (cadastrar ou alterar)
-        // ──────────────────────────────────────────────
-        var btnGravar = document.querySelector("#btnGravar");
-        btnGravar.addEventListener("click", gravarProduto);
-
-        function gravarProduto() {
-          var id = document.querySelector("#idProduto");
-          var nome = document.querySelector("#nomeProduto");
-          var categoria = document.querySelector("#categoriaProduto");
-          var marca = document.querySelector("#marcaProduto");
-          var preco = document.querySelector("#precoProduto");
-          var estoque = document.querySelector("#estoqueProduto");
-          var descricao = document.querySelector("#descProduto");
-
-          if (
-            nome.value != "" &&
-            categoria.value != "" &&
-            marca.value != "" &&
-            preco.value != "" &&
-            estoque.value != ""
-          ) {
-            // monta o objeto que sera enviado ao backend
-            var obj = {
-              id: id.value,
-              nome: nome.value,
-              categoria: categoria.value,
-              marca: marca.value,
-              preco: preco.value,
-              estoque: estoque.value,
-              descricao: descricao.value,
-            };
-
-            // se tem id preenchido estamos alterando, senao cadastrando
-            var url =
-              id.value == "" ? "/produto/cadastrar" : "/produto/alterar";
-
-            fetch(url, {
-              method: "POST",
-              body: JSON.stringify(obj),
-              headers: { "Content-Type": "application/json" },
-            })
-              .then(function (resposta) {
-                return resposta.json();
-              })
-              .then(function (corpoResposta) {
-                if (corpoResposta.ok) {
-                  alert("Produto gravado com sucesso!");
-                  window.location.reload();
-                } else {
-                  alert("Erro ao gravar o produto!");
-                }
-              });
-          } else {
-            alert("Preencha corretamente todos os campos obrigatorios!");
-          }
-        }
-
-        // ──────────────────────────────────────────────
-        // PRODUTOS - LIMPAR O FORMULARIO
-        // ──────────────────────────────────────────────
-        document
-          .querySelector("#btnLimpar")
-          .addEventListener("click", limparFormulario);
-
-        function limparFormulario() {
-          document.querySelector("#idProduto").value = "";
-          document.querySelector("#nomeProduto").value = "";
-          document.querySelector("#categoriaProduto").value = "";
-          document.querySelector("#marcaProduto").value = "";
-          document.querySelector("#precoProduto").value = "";
-          document.querySelector("#estoqueProduto").value = "";
-          document.querySelector("#descProduto").value = "";
-          document.querySelector("#tituloForm").textContent =
-            "Cadastrar Produto";
-        }
-
-        // ──────────────────────────────────────────────
-        // PRODUTOS - EDITAR (preenche o formulario)
-        // ──────────────────────────────────────────────
-        var botoesEditar = document.querySelectorAll(".btnEditar");
-
-        for (var i = 0; i < botoesEditar.length; i++) {
-          botoesEditar[i].addEventListener("click", editarProduto);
-        }
-
-        function editarProduto() {
-          document.querySelector("#idProduto").value = this.dataset.id;
-          document.querySelector("#nomeProduto").value = this.dataset.nome;
-          document.querySelector("#categoriaProduto").value =
-            this.dataset.categoria;
-          document.querySelector("#marcaProduto").value = this.dataset.marca;
-          document.querySelector("#precoProduto").value = this.dataset.preco;
-          document.querySelector("#estoqueProduto").value =
-            this.dataset.estoque;
-          document.querySelector("#descProduto").value = this.dataset.descricao;
-          document.querySelector("#tituloForm").textContent = "Alterar Produto";
-
-          document
-            .querySelector("#nomeProduto")
-            .scrollIntoView({ behavior: "smooth" });
-        }
-
-        // ──────────────────────────────────────────────
-        // PRODUTOS - EXCLUIR
-        // ──────────────────────────────────────────────
-        var botoesExcluir = document.querySelectorAll(".btnExcluir");
-
-        for (var j = 0; j < botoesExcluir.length; j++) {
-          botoesExcluir[j].addEventListener("click", excluirProduto);
-        }
-
-        function excluirProduto() {
-          var id = this.dataset.id;
-
-          if (confirm("Deseja realmente excluir este produto?")) {
-            fetch("/produto/excluir/" + id, { method: "DELETE" })
-              .then(function (resposta) {
-                return resposta.json();
-              })
-              .then(function (corpoResposta) {
-                if (corpoResposta.ok) {
-                  window.location.reload();
-                } else {
-                  alert("Erro ao excluir o produto!");
-                }
-              });
-          }
-        }
-
-        // ──────────────────────────────────────────────
-        // CATEGORIAS - GRAVAR
-        // ──────────────────────────────────────────────
-        document
-          .querySelector("#btnGravarCategoria")
-          .addEventListener("click", gravarCategoria);
-
-        function gravarCategoria() {
-          var nome = document.querySelector("#nomeCategoria");
-          var descricao = document.querySelector("#descCategoria");
-
-          if (nome.value != "") {
-            var obj = { nome: nome.value, descricao: descricao.value };
-
-            fetch("/categoria/cadastrar", {
-              method: "POST",
-              body: JSON.stringify(obj),
-              headers: { "Content-Type": "application/json" },
-            })
-              .then(function (resposta) {
-                return resposta.json();
-              })
-              .then(function (corpoResposta) {
-                if (corpoResposta.ok) {
-                  alert("Categoria cadastrada com sucesso!");
-                  window.location.reload();
-                } else {
-                  alert("Erro ao cadastrar a categoria!");
-                }
-              });
-          } else {
-            alert("Informe o nome da categoria!");
-          }
-        }
-
-        // ──────────────────────────────────────────────
-        // CATEGORIAS - EXCLUIR
-        // ──────────────────────────────────────────────
-        var botoesExcluirCategoria = document.querySelectorAll(
-          ".btnExcluirCategoria",
-        );
-
-        for (var k = 0; k < botoesExcluirCategoria.length; k++) {
-          botoesExcluirCategoria[k].addEventListener("click", excluirCategoria);
-        }
-
-        function excluirCategoria() {
-          var id = this.dataset.id;
-
-          if (confirm("Deseja realmente excluir esta categoria?")) {
-            fetch("/categoria/excluir/" + id, { method: "DELETE" })
-              .then(function (resposta) {
-                return resposta.json();
-              })
-              .then(function (corpoResposta) {
-                if (corpoResposta.ok) {
-                  window.location.reload();
-                } else {
-                  alert(
-                    "Erro ao excluir! Verifique se existe produto usando esta categoria.",
-                  );
-                }
-              });
-          }
-        }
-
-        // ──────────────────────────────────────────────
-        // MARCAS - GRAVAR
-        // ──────────────────────────────────────────────
-        document
-          .querySelector("#btnGravarMarca")
-          .addEventListener("click", gravarMarca);
-
-        function gravarMarca() {
-          var nome = document.querySelector("#nomeMarca");
-
-          if (nome.value != "") {
-            var obj = { nome: nome.value };
-
-            fetch("/marca/cadastrar", {
-              method: "POST",
-              body: JSON.stringify(obj),
-              headers: { "Content-Type": "application/json" },
-            })
-              .then(function (resposta) {
-                return resposta.json();
-              })
-              .then(function (corpoResposta) {
-                if (corpoResposta.ok) {
-                  alert("Marca cadastrada com sucesso!");
-                  window.location.reload();
-                } else {
-                  alert("Erro ao cadastrar a marca!");
-                }
-              });
-          } else {
-            alert("Informe o nome da marca!");
-          }
-        }
-
-        // ──────────────────────────────────────────────
-        // MARCAS - EXCLUIR
-        // ──────────────────────────────────────────────
-        var botoesExcluirMarca = document.querySelectorAll(".btnExcluirMarca");
-
-        for (var m = 0; m < botoesExcluirMarca.length; m++) {
-          botoesExcluirMarca[m].addEventListener("click", excluirMarca);
-        }
-
-        function excluirMarca() {
-          var id = this.dataset.id;
-
-          if (confirm("Deseja realmente excluir esta marca?")) {
-            fetch("/marca/excluir/" + id, { method: "DELETE" })
-              .then(function (resposta) {
-                return resposta.json();
-              })
-              .then(function (corpoResposta) {
-                if (corpoResposta.ok) {
-                  window.location.reload();
-                } else {
-                  alert(
-                    "Erro ao excluir! Verifique se existe produto usando esta marca.",
-                  );
-                }
-              });
-          }
-        }
-      });
-    </script>
+    <script src="/JS/scripts/pageAdm.js"></script>
   </body>
 </html>

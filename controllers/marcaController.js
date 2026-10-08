@@ -1,22 +1,54 @@
 const Marca = require("../models/marcaModel");
 
 class MarcaController {
+  async listar(req, res) {
+    const marcas = await new Marca().listar();
+    return res.send(
+      marcas.map((marca) => ({
+        id: marca.id,
+        nomeMarca: marca.nomeMarca,
+      })),
+    );
+  }
+
   async cadastrar(req, res) {
-    if (req.body.nome != "") {
-      let marca = new Marca(0, req.body.nome);
-      let okRetornoBanco = await marca.cadastrar();
-      res.send({ ok: okRetornoBanco });
-    } else {
-      res.send({ ok: false });
+    const { nome } = req.body;
+    if (typeof nome !== "string" || !nome.trim()) {
+      return res.send({ ok: false });
     }
+
+    const marca = new Marca(0, nome.trim());
+    const okRetornoBanco = await marca.cadastrar();
+    return res.send({ ok: okRetornoBanco });
+  }
+
+  async alterar(req, res) {
+    const { id, nome } = req.body;
+    const idMarca = Number(id);
+
+    if (
+      !Number.isSafeInteger(idMarca) ||
+      idMarca <= 0 ||
+      typeof nome !== "string" ||
+      !nome.trim()
+    ) {
+      return res.send({ ok: false });
+    }
+
+    const marca = new Marca(idMarca, nome.trim());
+    const okRetornoBanco = await marca.alterar();
+    return res.send({ ok: okRetornoBanco });
   }
 
   //exclusao via fetch
   async excluir(req, res) {
-    let id = req.params.id;
-    let marca = new Marca();
-    let okRetornoBanco = await marca.excluir(id);
-    res.send({ ok: okRetornoBanco });
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.send({ ok: false });
+    }
+    const marca = new Marca();
+    const okRetornoBanco = await marca.excluir(id);
+    return res.send({ ok: okRetornoBanco });
   }
 }
 

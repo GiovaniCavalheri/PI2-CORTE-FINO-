@@ -34,6 +34,9 @@ class Administrador {
     this.#emailAdm = valor;
   }
 
+  get senhaAdm() {
+    return this.#senhaAdm;
+  }
   set senhaAdm(valor) {
     this.#senhaAdm = valor;
   }

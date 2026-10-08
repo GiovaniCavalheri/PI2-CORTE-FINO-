@@ -4,11 +4,13 @@ class Socio {
   #id;
   #dataAdesao;
   #dataVencimento;
+  #senhaSocio;
 
-  constructor(id, dataAdesao, dataVencimento) {
+  constructor(id, dataAdesao, dataVencimento, senhaSocio) {
     this.#id = id;
     this.#dataAdesao = dataAdesao;
     this.#dataVencimento = dataVencimento;
+    this.#senhaSocio = senhaSocio;
   }
 
   get id() {
@@ -30,6 +32,13 @@ class Socio {
   }
   set dataVencimento(valor) {
     this.#dataVencimento = valor;
+  }
+
+  get senhaSocio() {
+    return this.#senhaSocio;
+  }
+  set senhaSocio(valor) {
+    this.#senhaSocio = valor;
   }
 
   async cadastrar() {

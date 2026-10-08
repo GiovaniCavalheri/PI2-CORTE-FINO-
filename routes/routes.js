@@ -31,6 +31,7 @@ router.get("/signatures", home.signaturesView);
 router.get("/join", home.joinView);
 router.get("/cart", home.cartView);
 router.get("/cadastro", home.cadastroView);
+router.get("/usuario/cadastrar", home.cadastroView);
 router.get("/adm", home.admView);
 
 //produtos

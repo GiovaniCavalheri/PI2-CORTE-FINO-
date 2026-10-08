@@ -3,13 +3,11 @@ const CategoriasProduto = require("../models/categoriaProdutoModel");
 const Marca = require("../models/marcaModel");
 
 class ProdutoController {
-  //pagina publica: lista os produtos vindos do banco
   async produtosView(req, res) {
     let produtos = await new Produtos().listarDetalhado();
     res.render("products", { produtos: produtos });
   }
 
-  //painel administrativo: tabela de produtos + selects de categoria e marca
   async painelView(req, res) {
     let produtos = await new Produtos().listarDetalhado();
     let categorias = await new CategoriasProduto().listar();

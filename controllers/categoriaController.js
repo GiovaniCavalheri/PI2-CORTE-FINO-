@@ -1,7 +1,6 @@
 const CategoriasProduto = require("../models/categoriaProdutoModel");
 
 class CategoriaController {
-  //gravacao via fetch
   async cadastrar(req, res) {
     if (req.body.nome != "") {
       let categoria = new CategoriasProduto(0, req.body.nome, req.body.descricao);

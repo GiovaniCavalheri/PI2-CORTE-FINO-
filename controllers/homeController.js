@@ -1,5 +1,4 @@
 class HomeController {
-  //paginas estaticas do site
   indexView(req, res) {
     res.render("index");
   }

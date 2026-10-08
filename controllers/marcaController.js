@@ -1,7 +1,6 @@
 const Marca = require("../models/marcaModel");
 
 class MarcaController {
-  //gravacao via fetch
   async cadastrar(req, res) {
     if (req.body.nome != "") {
       let marca = new Marca(0, req.body.nome);

@@ -1,9 +1,3 @@
-// ============================================================
-// cadastro.js — Corte Fino
-// ============================================================
-
-// ── ALTERNÂNCIA DE FORMULÁRIOS ────────────────────────────────
-
 function mostrarForm(qual) {
   let formSocio = document.querySelector("#formSocio");
   let formFornecedor = document.querySelector("#formFornecedor");
@@ -142,7 +136,6 @@ function validaEmail(input) {
   return true;
 }
 
-// Chamada pelo onblur do input de e-mail
 function validarEmail(input) {
   validaEmail(input);
 }
@@ -162,7 +155,6 @@ function validaCPF(input) {
     marcarErro(input, "CPF inválido.");
     return false;
   }
-  // Dígito verificador 1
   let soma = 0;
   for (let i = 0; i < 9; i++) soma += parseInt(cpf[i]) * (10 - i);
   let resto = (soma * 10) % 11;
@@ -293,8 +285,6 @@ function validaSenha(inputSenha, inputConfirma) {
 
   return valido;
 }
-
-// ── VALIDAÇÃO PRINCIPAL (chamada pelo onsubmit dos dois forms) ─
 
 function validarCadastro(event, tipoForm) {
   event.preventDefault();

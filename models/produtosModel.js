@@ -1,3 +1,5 @@
+const Database = require("../database/database");
+
 class Produtos {
   #id;
   #idCategoria;
@@ -73,7 +75,77 @@ class Produtos {
   set qntEstoque(valor) {
     this.#qntEstoque = valor;
   }
+
+  async cadastrar() {
+    let sql =
+      "insert into PRODUTOS (ID_CATEGORIA, ID_MARCA, NOME_PRODUTO, DESCRICAO, PRECO_VENDA, QNT_ESTOQUE) values (?,?,?,?,?,?)";
+    let valores = [
+      this.#idCategoria,
+      this.#idMarca,
+      this.#nomeProduto,
+      this.#descricaoProduto,
+      this.#precoVenda,
+      this.#qntEstoque,
+    ];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
+  }
+
+  async excluir(id) {
+    let sql = "delete from PRODUTOS where ID_PRODUTO = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
+  }
+
+  async listar() {
+    let sql = "select * from PRODUTOS";
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql);
+
+    let lista = [];
+    for (let i = 0; i < linhas.length; i++) {
+      let linha = linhas[i];
+      let produto = new Produtos(
+        linha["ID_PRODUTO"],
+        linha["ID_CATEGORIA"],
+        linha["ID_MARCA"],
+        linha["NOME_PRODUTO"],
+        linha["DESCRICAO"],
+        linha["PRECO_VENDA"],
+        linha["QNT_ESTOQUE"],
+      );
+
+      lista.push(produto);
+    }
+    return lista;
+  }
+
+  async alterar() {
+    let sql =
+      "update PRODUTOS set ID_CATEGORIA = ?, ID_MARCA = ?, NOME_PRODUTO = ?, DESCRICAO = ?, PRECO_VENDA = ?, QNT_ESTOQUE = ? where ID_PRODUTO = ?";
+    let valores = [
+      this.#idCategoria,
+      this.#idMarca,
+      this.#nomeProduto,
+      this.#descricaoProduto,
+      this.#precoVenda,
+      this.#qntEstoque,
+      this.#id,
+    ];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
+  }
 }
 
-
-module.exports = Produtos
+module.exports = Produtos;

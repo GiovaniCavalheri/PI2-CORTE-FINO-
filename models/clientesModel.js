@@ -1,3 +1,5 @@
+const Database = require("../database/database");
+
 class Cliente {
   #id;
   #cpfCliente;
@@ -63,6 +65,74 @@ class Cliente {
   set telComercial(valor) {
     this.#telComercial = valor;
   }
+
+  async cadastrar() {
+    let sql =
+      "insert into CLIENTE (CPF_CLIENTE, EMAIL_CLIENTE, ENDERECO_CLIENTE, TELEFONE, TEL_COMERCIAL) values (?,?,?,?,?)";
+    let valores = [
+      this.#cpfCliente,
+      this.#emailCliente,
+      this.#enderecoCliente,
+      this.#telefone,
+      this.#telComercial,
+    ];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
+  }
+
+  async excluir(id) {
+    let sql = "delete from CLIENTE where ID_CLIENTE = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
+  }
+
+  async listar() {
+    let sql = "select * from CLIENTE";
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql);
+
+    let lista = [];
+    for (let i = 0; i < linhas.length; i++) {
+      let linha = linhas[i];
+      let cliente = new Cliente(
+        linha["ID_CLIENTE"],
+        linha["CPF_CLIENTE"],
+        linha["EMAIL_CLIENTE"],
+        linha["ENDERECO_CLIENTE"],
+        linha["TELEFONE"],
+        linha["TEL_COMERCIAL"],
+      );
+
+      lista.push(cliente);
+    }
+    return lista;
+  }
+
+  async alterar() {
+    let sql =
+      "update CLIENTE set CPF_CLIENTE = ?, EMAIL_CLIENTE = ?, ENDERECO_CLIENTE = ?, TELEFONE = ?, TEL_COMERCIAL = ? where ID_CLIENTE = ?";
+    let valores = [
+      this.#cpfCliente,
+      this.#emailCliente,
+      this.#enderecoCliente,
+      this.#telefone,
+      this.#telComercial,
+      this.#id,
+    ];
+
+    let banco = new Database();
+    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+
+    return result;
+  }
 }
 
-module.exports = Cliente
+module.exports = Cliente;

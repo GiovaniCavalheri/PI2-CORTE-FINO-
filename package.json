@@ -4,7 +4,8 @@
   "description": "Padrão de trabalho em equipe para o repositório [PI-CORTE-FINO-REFAT](https://github.com/GiovaniCavalheri/PI-CORTE-FINO-REFAT).",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "repository": {
     "type": "git",

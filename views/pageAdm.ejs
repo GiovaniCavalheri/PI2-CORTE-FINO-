@@ -6,7 +6,7 @@
     <title>Corte Fino — Painel Admin</title>
     <link
       rel="shortcut icon"
-      href="/src/public/icon-Corte-Fino.ico"
+      href="/images/icon-Corte-Fino.ico"
       type="image/x-icon"
     />
     <link
@@ -25,900 +25,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <style>
-      :root {
-        --bg: #e0d2c1;
-        --bg2: #fdf0df;
-        --bg3: #e9dfd6;
-        --surface: #e0cab3;
-        --border: #d0b89a;
-        --red: #87353a;
-        --red-dark: #91454a;
-        --red-light: #ad4c52;
-        --gold: #8a6245;
-        --gold-light: #a07855;
-        --text: #2e1a16;
-        --muted: #7a6255;
-        --sidebar-w: 260px;
-        --topbar-h: 64px;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: "Poppins", sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        display: flex;
-        min-height: 100vh;
-        font-size: 14px;
-      }
-
-      /* ── SIDEBAR ── */
-      #sidebar {
-        width: var(--sidebar-w);
-        background: var(--bg2);
-        border-right: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        z-index: 200;
-        transition: transform 0.3s ease;
-      }
-
-      #sidebar.collapsed {
-        transform: translateX(calc(-1 * var(--sidebar-w)));
-      }
-
-      .sidebar-brand {
-        padding: 24px 20px 20px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .brand-logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 6px;
-      }
-
-      .brand-icon {
-        width: 36px;
-        height: 36px;
-        background: var(--red);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-      }
-
-      .brand-name {
-        font-family: "Playfair Display", serif;
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--text);
-        line-height: 1.2;
-      }
-
-      .brand-sub {
-        font-size: 11px;
-        color: var(--muted);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-left: 46px;
-      }
-
-      .sidebar-nav {
-        flex: 1;
-        padding: 16px 12px;
-        overflow-y: auto;
-      }
-
-      .nav-label {
-        font-size: 10px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--muted);
-        padding: 10px 8px 6px;
-      }
-
-      .nav-link-cf {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 8px;
-        color: var(--muted);
-        text-decoration: none;
-        font-size: 13.5px;
-        font-weight: 400;
-        transition:
-          background 0.15s,
-          color 0.15s;
-        margin-bottom: 2px;
-        cursor: pointer;
-      }
-
-      .nav-link-cf i {
-        width: 18px;
-        text-align: center;
-        font-size: 15px;
-      }
-
-      .nav-link-cf:hover {
-        background: var(--bg3);
-        color: var(--text);
-      }
-
-      .nav-link-cf.active {
-        background: rgba(133, 52, 57, 0.13);
-        color: var(--red-dark);
-        font-weight: 500;
-      }
-
-      .nav-link-cf.active i {
-        color: var(--red-dark);
-      }
-
-      .sidebar-footer {
-        padding: 16px 20px;
-        border-top: 1px solid var(--border);
-      }
-
-      .sidebar-footer a {
-        color: var(--muted);
-        text-decoration: none;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: color 0.15s;
-      }
-
-      .sidebar-footer a:hover {
-        color: var(--text);
-      }
-
-      /* ── MAIN ── */
-      #main {
-        margin-left: var(--sidebar-w);
-        flex: 1;
-        min-height: 100vh;
-        transition: margin-left 0.3s ease;
-      }
-
-      #main.expanded {
-        margin-left: 0;
-      }
-
-      /* ── TOPBAR ── */
-      .topbar {
-        height: var(--topbar-h);
-        background: var(--bg2);
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 24px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
-
-      .btn-toggle {
-        background: none;
-        border: 1px solid var(--border);
-        color: var(--muted);
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition:
-          border-color 0.15s,
-          color 0.15s;
-      }
-
-      .btn-toggle:hover {
-        border-color: var(--red);
-        color: var(--red-dark);
-      }
-
-      .topbar-title {
-        font-family: "Playfair Display", serif;
-        font-size: 20px;
-        font-weight: 600;
-        color: var(--text);
-        margin-left: 12px;
-      }
-
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: var(--red);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        letter-spacing: 0.04em;
-      }
-
-      .topbar-badge {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        color: var(--muted);
-        font-size: 12px;
-        padding: 4px 12px;
-        border-radius: 20px;
-      }
-
-      /* ── CONTENT ── */
-      .page-content {
-        display: none;
-        padding: 28px 28px 40px;
-      }
-      .page-content.active {
-        display: block;
-      }
-
-      /* ── CARDS ── */
-      .stat-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        margin-bottom: 28px;
-      }
-
-      .stat-card {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 18px 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .stat-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 3px;
-        height: 100%;
-        background: var(--red);
-      }
-
-      .stat-icon {
-        width: 42px;
-        height: 42px;
-        background: rgba(133, 52, 57, 0.15);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--red-dark);
-        font-size: 18px;
-        flex-shrink: 0;
-      }
-
-      .stat-value {
-        font-family: "Playfair Display", serif;
-        font-size: 26px;
-        font-weight: 700;
-        color: var(--text);
-        line-height: 1;
-      }
-
-      .stat-label {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 3px;
-      }
-
-      .form-card {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 22px 24px;
-        margin-bottom: 24px;
-      }
-
-      .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 18px;
-      }
-
-      .section-title {
-        font-family: "Playfair Display", serif;
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--text);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .section-title i {
-        color: var(--red);
-        font-size: 16px;
-      }
-
-      /* ── FORM ELEMENTS ── */
-      label.form-label {
-        display: block;
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--muted);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        margin-bottom: 6px;
-      }
-
-      input[type="text"],
-      input[type="number"],
-      textarea,
-      select {
-        width: 100%;
-        background: var(--bg3);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--text);
-        padding: 10px 14px;
-        font-family: "Poppins", sans-serif;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-      }
-
-      input:focus,
-      textarea:focus,
-      select:focus {
-        border-color: var(--red);
-      }
-
-      input.campo-invalido {
-        border-color: var(--red) !important;
-        background: rgba(135, 53, 58, 0.06);
-      }
-
-      .msg-erro-campo {
-        font-size: 11px;
-        color: var(--red);
-        margin-top: 4px;
-        display: none;
-      }
-
-      .msg-erro-campo.show {
-        display: block;
-      }
-
-      select option {
-        background: var(--bg3);
-      }
-
-      .form-row {
-        display: grid;
-        gap: 16px;
-        margin-bottom: 16px;
-      }
-
-      .form-row.cols-2 {
-        grid-template-columns: 1fr 1fr;
-      }
-      .form-row.cols-3 {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-
-      @media (max-width: 640px) {
-        .form-row.cols-2,
-        .form-row.cols-3 {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      /* ── BUTTONS ── */
-      .btn-red {
-        background: var(--red);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-family: "Poppins", sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition:
-          background 0.15s,
-          transform 0.1s;
-      }
-
-      .btn-red:hover {
-        background: var(--red-dark);
-      }
-      .btn-red:active {
-        transform: scale(0.97);
-      }
-
-      .btn-outline {
-        background: transparent;
-        color: var(--muted);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-family: "Poppins", sans-serif;
-        font-size: 14px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition:
-          border-color 0.15s,
-          color 0.15s;
-      }
-
-      .btn-outline:hover {
-        border-color: var(--red);
-        color: var(--red-dark);
-      }
-
-      .btn-danger {
-        background: rgba(133, 52, 57, 0.13);
-        color: var(--red-dark);
-        border: 1px solid rgba(133, 52, 57, 0.35);
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-family: "Poppins", sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: background 0.15s;
-      }
-
-      .btn-danger:hover {
-        background: rgba(133, 52, 57, 0.3);
-      }
-
-      .btn-gold {
-        background: var(--gold);
-        color: #1a1009;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-family: "Poppins", sans-serif;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: background 0.15s;
-      }
-
-      .btn-gold:hover {
-        background: var(--gold-light);
-      }
-
-      /* ── ALERT ── */
-      .alert-cf {
-        background: rgba(133, 52, 57, 0.1);
-        border: 1px solid rgba(133, 52, 57, 0.35);
-        color: var(--red-dark);
-        border-radius: 8px;
-        padding: 12px 16px;
-        display: none;
-        align-items: center;
-        gap: 10px;
-        font-size: 13.5px;
-        margin-bottom: 16px;
-      }
-
-      .alert-cf.show {
-        display: flex;
-      }
-
-      .alert-err {
-        background: rgba(133, 52, 57, 0.12);
-        border: 1px solid rgba(133, 52, 57, 0.35);
-        color: var(--red-dark);
-        border-radius: 8px;
-        padding: 12px 16px;
-        display: none;
-        align-items: center;
-        gap: 10px;
-        font-size: 13.5px;
-        margin-bottom: 16px;
-      }
-
-      .alert-err.show {
-        display: flex;
-      }
-
-      /* ── TABLE ── */
-      .table-wrap {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow: hidden;
-      }
-
-      .table-toolbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 20px;
-        border-bottom: 1px solid var(--border);
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .table-info {
-        font-size: 13px;
-        color: var(--muted);
-      }
-
-      .table-info strong {
-        color: var(--text);
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      thead tr {
-        background: var(--bg3);
-      }
-
-      th {
-        padding: 12px 16px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--muted);
-        border-bottom: 1px solid var(--border);
-      }
-
-      tbody tr {
-        border-bottom: 1px solid var(--border);
-        transition: background 0.12s;
-      }
-
-      tbody tr:last-child {
-        border-bottom: none;
-      }
-      tbody tr:hover {
-        background: var(--bg3);
-      }
-      tbody tr.row-selected {
-        background: rgba(133, 52, 57, 0.08);
-      }
-
-      td {
-        padding: 13px 16px;
-        font-size: 13.5px;
-        color: var(--text);
-        vertical-align: middle;
-      }
-
-      input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        accent-color: var(--red);
-        cursor: pointer;
-      }
-
-      /* ── BADGES ── */
-      .badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 0.04em;
-      }
-
-      .badge-cat {
-        background: rgba(194, 168, 140, 0.3);
-        color: var(--gold);
-        border: 1px solid var(--border);
-      }
-
-      .badge-ativo {
-        background: rgba(133, 52, 57, 0.1);
-        color: var(--red-dark);
-        border: 1px solid rgba(133, 52, 57, 0.3);
-      }
-
-      .badge-destaque {
-        background: rgba(194, 168, 140, 0.35);
-        color: var(--gold);
-        border: 1px solid var(--border);
-      }
-
-      .badge-inativo {
-        background: rgba(106, 90, 80, 0.12);
-        color: var(--muted);
-        border: 1px solid var(--border);
-      }
-
-      /* ── ACTION ICONS ── */
-      .action-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--muted);
-        font-size: 14px;
-        padding: 4px 6px;
-        border-radius: 5px;
-        transition:
-          color 0.15s,
-          background 0.15s;
-      }
-
-      .action-btn:hover {
-        color: var(--text);
-        background: var(--surface);
-      }
-      .action-btn.del:hover {
-        color: var(--red-dark);
-        background: rgba(133, 52, 57, 0.1);
-      }
-
-      /* ── UPLOAD AREA ── */
-      .upload-area {
-        border: 2px dashed var(--border);
-        border-radius: 10px;
-        padding: 28px;
-        text-align: center;
-        cursor: pointer;
-        transition:
-          border-color 0.2s,
-          background 0.2s;
-        color: var(--muted);
-      }
-
-      .upload-area:hover {
-        border-color: var(--red);
-        background: rgba(133, 52, 57, 0.05);
-        color: var(--text);
-      }
-      .upload-area i {
-        font-size: 28px;
-        display: block;
-        margin-bottom: 8px;
-      }
-      .upload-area input {
-        display: none;
-      }
-
-      #imgPreviewEl {
-        display: none;
-        max-width: 160px;
-        max-height: 160px;
-        border-radius: 8px;
-        border: 2px solid var(--border);
-        margin-top: 10px;
-      }
-
-      /* ── DASHBOARD QUICK ACCESS ── */
-      .quick-btn {
-        width: 100%;
-        text-align: left;
-        margin-bottom: 8px;
-        background: var(--bg3);
-        color: var(--text);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-family: "Poppins", sans-serif;
-        font-size: 14px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition:
-          border-color 0.15s,
-          background 0.15s;
-      }
-
-      .quick-btn i {
-        color: var(--red);
-      }
-      .quick-btn:hover {
-        border-color: var(--red);
-        background: rgba(133, 52, 57, 0.06);
-      }
-
-      /* ── HORARIO ── */
-      .horario-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-        border-bottom: 1px solid var(--border);
-        font-size: 13.5px;
-      }
-
-      .horario-item:last-child {
-        border-bottom: none;
-      }
-      .horario-item span:first-child {
-        color: var(--muted);
-      }
-      .horario-item strong {
-        color: var(--gold);
-      }
-
-      /* ── DIVIDER ── */
-      .divider {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 24px 0;
-      }
-
-      /* ── EMPTY STATE ── */
-      .empty-state {
-        text-align: center;
-        padding: 40px;
-        color: var(--muted);
-      }
-
-      .empty-state i {
-        font-size: 36px;
-        margin-bottom: 12px;
-        display: block;
-        opacity: 0.4;
-      }
-      .empty-state p {
-        font-size: 14px;
-      }
-
-      /* ── SELECTION BAR ── */
-      .selection-bar {
-        background: rgba(133, 52, 57, 0.12);
-        border: 1px solid rgba(133, 52, 57, 0.3);
-        border-radius: 8px;
-        padding: 10px 16px;
-        display: none;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        font-size: 13px;
-        color: var(--red-dark);
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .selection-bar.show {
-        display: flex;
-      }
-
-      /* ── REPORTS ── */
-      .report-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 16px;
-      }
-
-      .report-card {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow: hidden;
-        transition:
-          border-color 0.2s,
-          transform 0.2s;
-        cursor: pointer;
-      }
-
-      .report-card:hover {
-        border-color: var(--red);
-        transform: translateY(-2px);
-      }
-
-      .report-img {
-        background: var(--bg3);
-        height: 120px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 8px;
-        color: var(--muted);
-        font-size: 13px;
-      }
-
-      .report-img i {
-        font-size: 32px;
-        color: var(--red);
-        opacity: 0.7;
-      }
-
-      .report-body {
-        padding: 14px 16px;
-      }
-      .report-body h6 {
-        font-size: 13.5px;
-        font-weight: 500;
-        color: var(--text);
-        margin-bottom: 4px;
-      }
-      .report-body p {
-        font-size: 12px;
-        color: var(--muted);
-      }
-
-      /* ── PRICE DISPLAY ── */
-      .price-text {
-        color: var(--gold);
-        font-weight: 500;
-      }
-
-      /* ── SCROLLBAR ── */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: var(--bg);
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--surface);
-        border-radius: 3px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--border);
-      }
-
-      /* ── MOBILE ── */
-      @media (max-width: 768px) {
-        #sidebar {
-          transform: translateX(calc(-1 * var(--sidebar-w)));
-        }
-        #sidebar.open {
-          transform: translateX(0);
-        }
-        #main {
-          margin-left: 0 !important;
-        }
-        .page-content {
-          padding: 16px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/CSS/pageAdm.css" />
   </head>
   <body>
     <!-- ═══════ SIDEBAR ═══════ -->
@@ -941,13 +48,16 @@
         <a class="nav-link-cf" data-section="produtos">
           <i class="fa-solid fa-box-open"></i> Produtos
         </a>
+        <a class="nav-link-cf" data-section="cadastros">
+          <i class="fa-solid fa-tags"></i> Categorias e Marcas
+        </a>
         <a class="nav-link-cf" data-section="relatorios">
-          <i class="fa-solid fa-chart-pie"></i> Relatórios
+          <i class="fa-solid fa-chart-pie"></i> Relatorios
         </a>
       </nav>
 
       <div class="sidebar-footer">
-        <a href="/index.html">
+        <a href="/">
           <i class="fa-solid fa-arrow-left"></i> Voltar ao Site
         </a>
       </div>
@@ -957,7 +67,7 @@
     <div id="main">
       <!-- TOPBAR -->
       <div class="topbar">
-        <div style="display: flex; align-items: center; gap: 12px">
+        <div class="topbar-group">
           <button class="btn-toggle" id="toggleSidebar">
             <i class="fa-solid fa-bars"></i>
           </button>
@@ -967,7 +77,7 @@
           <span class="topbar-badge"
             ><i
               class="fa-solid fa-circle"
-              style="color: #853439; font-size: 8px; margin-right: 6px"
+              class="online-indicator"
             ></i
             >Online</span
           >
@@ -981,22 +91,22 @@
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
             <div>
-              <div class="stat-value" id="dashTotal">—</div>
+              <div class="stat-value" id="totalProdutos"><%= produtos.length %></div>
               <div class="stat-label">Produtos cadastrados</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
             <div>
-              <div class="stat-value" id="dashDestaques">—</div>
-              <div class="stat-label">Destaques da semana</div>
+              <div class="stat-value" id="totalCategorias"><%= categorias.length %></div>
+              <div class="stat-label">Categorias cadastradas</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-tag"></i></div>
             <div>
-              <div class="stat-value" id="dashAtivos">—</div>
-              <div class="stat-label">Produtos ativos</div>
+              <div class="stat-value" id="totalMarcas"><%= marcas.length %></div>
+              <div class="stat-label">Marcas cadastradas</div>
             </div>
           </div>
           <div class="stat-card">
@@ -1008,9 +118,9 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+        <div class="dashboard-grid">
           <div class="form-card">
-            <div class="section-title" style="margin-bottom: 16px">
+            <div class="section-title section-title-spaced">
               <i class="fa-solid fa-bolt"></i> Acesso Rápido
             </div>
             <button class="quick-btn" onclick="navigateTo('produtos')">
@@ -1024,7 +134,7 @@
             </button>
           </div>
           <div class="form-card">
-            <div class="section-title" style="margin-bottom: 16px">
+            <div class="section-title section-title-spaced">
               <i class="fa-solid fa-clock"></i> Funcionamento
             </div>
             <div class="horario-item">
@@ -1049,23 +159,18 @@
 
       <!-- ═══════ PRODUTOS ═══════ -->
       <div class="page-content" id="section-produtos">
-        <!-- FORMULÁRIO -->
+        <!-- FORMULARIO DE PRODUTO -->
         <div class="section-header">
           <div class="section-title">
-            <i class="fa-solid fa-plus-circle"></i> Cadastrar Produto
+            <i class="fa-solid fa-plus-circle"></i>
+            <span id="tituloForm">Cadastrar Produto</span>
           </div>
         </div>
 
-        <div id="alertOk" class="alert-cf">
-          <i class="fa-solid fa-circle-check"></i> Produto cadastrado com
-          sucesso!
-        </div>
-        <div id="alertErr" class="alert-err">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span id="alertErrMsg">Preencha os campos obrigatórios.</span>
-        </div>
-
         <div class="form-card">
+          <!-- guarda o id quando estamos editando um produto -->
+          <input type="hidden" id="idProduto" value="" />
+
           <div class="form-row cols-2">
             <div>
               <label class="form-label">Nome do Produto *</label>
@@ -1079,142 +184,264 @@
               <label class="form-label">Categoria *</label>
               <select id="categoriaProduto">
                 <option value="">Selecione...</option>
-                <option>Bovino</option>
-                <option>Suíno</option>
-                <option>Frango</option>
-                <option>Especial</option>
-                <option>Embutidos</option>
-                <option>Aves</option>
+                <% for (let i = 0; i < categorias.length; i++) { %>
+                <option value="<%= categorias[i].id %>">
+                  <%= categorias[i].nomeCategoria %>
+                </option>
+                <% } %>
               </select>
             </div>
           </div>
-          <div class="form-row" style="margin-bottom: 16px">
+
+          <div class="form-row cols-3">
             <div>
-              <label class="form-label">Descrição</label>
+              <label class="form-label">Marca *</label>
+              <select id="marcaProduto">
+                <option value="">Selecione...</option>
+                <% for (let i = 0; i < marcas.length; i++) { %>
+                <option value="<%= marcas[i].id %>">
+                  <%= marcas[i].nomeMarca %>
+                </option>
+                <% } %>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Preco (R$/kg) *</label>
+              <input type="number" step="0.01" id="precoProduto" placeholder="0.00" />
+            </div>
+            <div>
+              <label class="form-label">Quantidade em estoque *</label>
+              <input type="number" id="estoqueProduto" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="form-row form-row-spaced">
+            <div>
+              <label class="form-label">Descricao</label>
               <textarea
                 id="descProduto"
                 rows="2"
-                placeholder="Descrição breve..."
+                placeholder="Descricao breve..."
               ></textarea>
             </div>
           </div>
-          <div class="form-row cols-3">
-            <div>
-              <label class="form-label">Preço (R$/kg) *</label>
-              <input
-                type="text"
-                id="precoProduto"
-                placeholder="R$ 0,00"
-                inputmode="numeric"
-                oninput="
-                  mascaraMoeda(this);
-                  limparErroCampo('precoProduto');
-                "
-              />
-              <span class="msg-erro-campo" id="erroPrecoProduto"></span>
-            </div>
-            <div>
-              <label class="form-label">Status</label>
-              <select id="statusProduto">
-                <option value="Ativo">Ativo</option>
-                <option value="Destaque">Destaque da Semana</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">Imagem</label>
-              <label
-                class="upload-area"
-                for="imgProduto"
-                style="
-                  padding: 12px;
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-                  justify-content: center;
-                "
-              >
-                <i
-                  class="fa-solid fa-cloud-arrow-up"
-                  style="font-size: 18px; margin: 0"
-                ></i>
-                <span id="uploadLabel" style="font-size: 13px"
-                  >Selecionar imagem</span
-                >
-                <input type="file" id="imgProduto" accept="image/*" />
-              </label>
-            </div>
-          </div>
-          <img id="imgPreviewEl" src="" alt="Preview" />
-          <div style="display: flex; gap: 10px; margin-top: 8px">
-            <button class="btn-red" onclick="cadastrarProduto()">
+
+          <div class="form-actions">
+            <button class="btn-red" id="btnGravar">
               <i class="fa-solid fa-floppy-disk"></i> Salvar Produto
             </button>
-            <button class="btn-outline" onclick="limparFormulario()">
-              Limpar
-            </button>
+            <button class="btn-outline" id="btnLimpar">Limpar</button>
           </div>
         </div>
 
-        <!-- TABELA COM CHECKBOX -->
+        <!-- TABELA DE PRODUTOS -->
         <div class="section-header">
           <div class="section-title">
             <i class="fa-solid fa-list-ul"></i> Produtos Cadastrados
           </div>
         </div>
 
-        <div id="selectionBar" class="selection-bar">
-          <span
-            ><i class="fa-solid fa-check-square" style="margin-right: 6px"></i
-            ><span id="selCount">0</span> produto(s) selecionado(s)</span
-          >
-          <div style="display: flex; gap: 8px">
-            <button class="btn-danger" onclick="excluirSelecionados()">
-              <i class="fa-solid fa-trash"></i> Excluir selecionados
-            </button>
-            <button class="btn-outline" onclick="desmarcarTodos()">
-              Cancelar
-            </button>
-          </div>
-        </div>
-
         <div class="table-wrap">
           <div class="table-toolbar">
             <div class="table-info">
-              Total: <strong id="totalProdutos">0</strong> produto(s)
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <label
-                style="
-                  font-size: 12px;
-                  color: var(--muted);
-                  display: flex;
-                  align-items: center;
-                  gap: 6px;
-                  cursor: pointer;
-                "
-              >
-                <input
-                  type="checkbox"
-                  id="checkAll"
-                  onclick="toggleTodos(this)"
-                />
-                Selecionar todos
-              </label>
+              Total: <strong><%= produtos.length %></strong> produto(s)
             </div>
           </div>
           <table>
             <thead>
               <tr>
-                <th style="width: 40px"></th>
                 <th>Produto</th>
                 <th>Categoria</th>
-                <th>Preço</th>
-                <th>Status</th>
-                <th style="width: 80px">Ações</th>
+                <th>Marca</th>
+                <th>Preco</th>
+                <th>Estoque</th>
+                <th class="table-actions-wide">Acoes</th>
               </tr>
             </thead>
-            <tbody id="tabelaProdutos"></tbody>
+            <tbody id="listaProdutos">
+              <% if (produtos.length == 0) { %>
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>Nenhum produto cadastrado ainda.</p>
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+
+              <% for (let i = 0; i < produtos.length; i++) { %>
+              <tr>
+                <td><%= produtos[i].NOME_PRODUTO %></td>
+                <td><%= produtos[i].NOME_CATEGORIA %></td>
+                <td><%= produtos[i].NOME_MARCA %></td>
+                <td>R$ <%= produtos[i].PRECO_VENDA %></td>
+                <td><%= produtos[i].QNT_ESTOQUE %></td>
+                <td>
+                  <button
+                    class="btn-outline btnEditar"
+                    data-id="<%= produtos[i].ID_PRODUTO %>"
+                    data-nome="<%= produtos[i].NOME_PRODUTO %>"
+                    data-categoria="<%= produtos[i].ID_CATEGORIA %>"
+                    data-marca="<%= produtos[i].ID_MARCA %>"
+                    data-preco="<%= produtos[i].PRECO_VENDA %>"
+                    data-estoque="<%= produtos[i].QNT_ESTOQUE %>"
+                    data-descricao="<%= produtos[i].DESCRICAO %>"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    class="btn-danger btnExcluir"
+                    data-id="<%= produtos[i].ID_PRODUTO %>"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======= CADASTROS (CATEGORIAS E MARCAS) ======= -->
+      <div class="page-content" id="section-cadastros">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-tags"></i> Categorias
+          </div>
+        </div>
+
+        <div class="form-card">
+          <input type="hidden" id="idCategoria" value="" />
+          <div class="form-row cols-2">
+            <div>
+              <label class="form-label">Nome da Categoria *</label>
+              <input type="text" id="nomeCategoria" placeholder="Ex: Bovino" />
+            </div>
+            <div>
+              <label class="form-label">Descricao</label>
+              <input
+                type="text"
+                id="descCategoria"
+                placeholder="Descricao breve..."
+              />
+            </div>
+          </div>
+          <div class="form-actions-compact">
+            <button class="btn-red" id="btnGravarCategoria">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Categoria
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Descricao</th>
+                <th class="table-actions">Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="listaCategorias">
+              <% if (categorias.length == 0) { %>
+              <tr>
+                <td colspan="3">
+                  <div class="empty-state">
+                    <p>Nenhuma categoria cadastrada ainda.</p>
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+
+              <% for (let i = 0; i < categorias.length; i++) { %>
+              <tr>
+                <td><%= categorias[i].nomeCategoria %></td>
+                <td><%= categorias[i].descricao %></td>
+                <td>
+                  <button
+                    class="btn-outline btnEditarCategoria"
+                    data-id="<%= categorias[i].id %>"
+                    data-nome="<%= categorias[i].nomeCategoria %>"
+                    data-descricao="<%= categorias[i].descricao %>"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    class="btn-danger btnExcluirCategoria"
+                    data-id="<%= categorias[i].id %>"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-header section-header-separated">
+          <div class="section-title">
+            <i class="fa-solid fa-copyright"></i> Marcas
+          </div>
+        </div>
+
+        <div class="form-card">
+          <input type="hidden" id="idMarca" value="" />
+          <div class="form-row">
+            <div>
+              <label class="form-label">Nome da Marca *</label>
+              <input type="text" id="nomeMarca" placeholder="Ex: Friboi" />
+            </div>
+          </div>
+          <div class="form-actions-compact">
+            <button class="btn-red" id="btnGravarMarca">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Marca
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Marca</th>
+                <th class="table-actions">Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="listaMarcas">
+              <% if (marcas.length == 0) { %>
+              <tr>
+                <td colspan="2">
+                  <div class="empty-state">
+                    <p>Nenhuma marca cadastrada ainda.</p>
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+
+              <% for (let i = 0; i < marcas.length; i++) { %>
+              <tr>
+                <td><%= marcas[i].nomeMarca %></td>
+                <td>
+                  <button
+                    class="btn-outline btnEditarMarca"
+                    data-id="<%= marcas[i].id %>"
+                    data-nome="<%= marcas[i].nomeMarca %>"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    class="btn-danger btnExcluirMarca"
+                    data-id="<%= marcas[i].id %>"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
           </table>
         </div>
       </div>
@@ -1225,14 +452,13 @@
           <div class="section-title">
             <i class="fa-solid fa-chart-pie"></i> Relatórios
           </div>
-          <label class="btn-red" for="uploadRelatorio" style="cursor: pointer">
+          <label class="btn-red report-upload-label" for="uploadRelatorio">
             <i class="fa-solid fa-upload"></i> Enviar Relatório
             <input
               type="file"
               id="uploadRelatorio"
               accept="image/*"
-              style="display: none"
-              onchange="adicionarRelatorio(this)"
+              class="report-file-input"
             />
           </label>
         </div>
@@ -1279,528 +505,6 @@
     </div>
     <!-- /main -->
 
-    <script>
-      // ──────────────────────────────────────────────
-      // VETOR ESTÁTICO (simulação de banco de dados)
-      // ──────────────────────────────────────────────
-      var produtos = [
-        {
-          id: 1,
-          nome: "Picanha Premium",
-          categoria: "Bovino",
-          preco: 89.9,
-          status: "Destaque",
-          desc: "Corte nobre, marmoreio perfeito.",
-        },
-        {
-          id: 2,
-          nome: "Costela Bovina",
-          categoria: "Bovino",
-          preco: 45.9,
-          status: "Ativo",
-          desc: "Ideal para churrasco e panela.",
-        },
-        {
-          id: 3,
-          nome: "Frango Resfriado",
-          categoria: "Frango",
-          preco: 11.9,
-          status: "Destaque",
-          desc: "Frango inteiro, abatido no dia.",
-        },
-        {
-          id: 4,
-          nome: "Linguiça Toscana",
-          categoria: "Embutidos",
-          preco: 24.5,
-          status: "Ativo",
-          desc: "Artesanal, temperada na casa.",
-        },
-        {
-          id: 5,
-          nome: "Filé Mignon",
-          categoria: "Bovino",
-          preco: 119.9,
-          status: "Destaque",
-          desc: "O mais macio dos cortes bovinos.",
-        },
-        {
-          id: 6,
-          nome: "Pernil Suíno",
-          categoria: "Suíno",
-          preco: 28.9,
-          status: "Ativo",
-          desc: "Perfeito para assados.",
-        },
-        {
-          id: 7,
-          nome: "Coração de Frango",
-          categoria: "Aves",
-          preco: 14.9,
-          status: "Ativo",
-          desc: "Ótimo para churrasco.",
-        },
-        {
-          id: 8,
-          nome: "Alcatra Especial",
-          categoria: "Especial",
-          preco: 72.0,
-          status: "Ativo",
-          desc: "Selecionada para o clube.",
-        },
-        {
-          id: 9,
-          nome: "Calabresa Defumada",
-          categoria: "Embutidos",
-          preco: 19.9,
-          status: "Inativo",
-          desc: "Receita artesanal defumada.",
-        },
-        {
-          id: 10,
-          nome: "Costelinha Suína",
-          categoria: "Suíno",
-          preco: 38.5,
-          status: "Ativo",
-          desc: "Carnuda e saborosa.",
-        },
-      ];
-
-      var proximoId = 11;
-
-      // ──────────────────────────────────────────────
-      // NAVEGAÇÃO
-      // ──────────────────────────────────────────────
-      var sectionTitles = {
-        dashboard: "Painel",
-        produtos: "Produtos",
-        relatorios: "Relatórios",
-      };
-
-      function navigateTo(section) {
-        document.querySelectorAll(".page-content").forEach(function (el) {
-          el.classList.remove("active");
-        });
-        document.querySelectorAll(".nav-link-cf").forEach(function (el) {
-          el.classList.remove("active");
-        });
-        document.getElementById("section-" + section).classList.add("active");
-        document
-          .querySelector('[data-section="' + section + '"]')
-          .classList.add("active");
-        document.getElementById("topbarTitle").textContent =
-          sectionTitles[section] || section;
-
-        if (section === "dashboard") atualizarDashboard();
-        if (section === "produtos") renderizarTabela();
-      }
-
-      document.querySelectorAll(".nav-link-cf").forEach(function (link) {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
-          navigateTo(this.getAttribute("data-section"));
-        });
-      });
-
-      // ──────────────────────────────────────────────
-      // SIDEBAR TOGGLE
-      // ──────────────────────────────────────────────
-      document
-        .getElementById("toggleSidebar")
-        .addEventListener("click", function () {
-          var sidebar = document.getElementById("sidebar");
-          var main = document.getElementById("main");
-
-          if (window.innerWidth <= 768) {
-            sidebar.classList.toggle("open");
-          } else {
-            sidebar.classList.toggle("collapsed");
-            main.classList.toggle("expanded");
-          }
-        });
-
-      // ──────────────────────────────────────────────
-      // DASHBOARD
-      // ──────────────────────────────────────────────
-      function atualizarDashboard() {
-        document.getElementById("dashTotal").textContent = produtos.length;
-        document.getElementById("dashDestaques").textContent = produtos.filter(
-          function (p) {
-            return p.status === "Destaque";
-          },
-        ).length;
-        document.getElementById("dashAtivos").textContent = produtos.filter(
-          function (p) {
-            return p.status === "Ativo";
-          },
-        ).length;
-      }
-
-      // ──────────────────────────────────────────────
-      // RENDERIZAR TABELA
-      // ──────────────────────────────────────────────
-      function badgeStatus(status) {
-        if (status === "Ativo")
-          return '<span class="badge badge-ativo">Ativo</span>';
-        if (status === "Destaque")
-          return '<span class="badge badge-destaque">Destaque</span>';
-        return '<span class="badge badge-inativo">Inativo</span>';
-      }
-
-      function renderizarTabela() {
-        var tbody = document.getElementById("tabelaProdutos");
-        tbody.innerHTML = "";
-
-        if (produtos.length === 0) {
-          tbody.innerHTML =
-            '<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-box-open"></i><p>Nenhum produto cadastrado ainda.</p></div></td></tr>';
-          document.getElementById("totalProdutos").textContent = 0;
-          esconderSelectionBar();
-          return;
-        }
-
-        produtos.forEach(function (p) {
-          var tr = document.createElement("tr");
-          tr.id = "row-" + p.id;
-          tr.innerHTML =
-            '<td><input type="checkbox" class="check-prod" data-id="' +
-            p.id +
-            '" onchange="atualizarSelecao()" /></td>' +
-            "<td><strong>" +
-            p.nome +
-            '</strong><br><span style="font-size:12px;color:var(--muted);">' +
-            p.desc +
-            "</span></td>" +
-            '<td><span class="badge badge-cat">' +
-            p.categoria +
-            "</span></td>" +
-            '<td class="price-text">R$ ' +
-            p.preco.toFixed(2).replace(".", ",") +
-            "/kg</td>" +
-            "<td>" +
-            badgeStatus(p.status) +
-            "</td>" +
-            "<td>" +
-            '<button class="action-btn" title="Editar" onclick="editarProduto(' +
-            p.id +
-            ')"><i class="fa-solid fa-pen"></i></button>' +
-            '<button class="action-btn del" title="Excluir" onclick="excluirUm(' +
-            p.id +
-            ')"><i class="fa-solid fa-trash"></i></button>' +
-            "</td>";
-          tbody.appendChild(tr);
-        });
-
-        document.getElementById("totalProdutos").textContent = produtos.length;
-        document.getElementById("checkAll").checked = false;
-        atualizarDashboard();
-      }
-
-      // ──────────────────────────────────────────────
-      // SELEÇÃO COM CHECKBOX
-      // ──────────────────────────────────────────────
-      function atualizarSelecao() {
-        var selecionados = document.querySelectorAll(".check-prod:checked");
-        var total = document.querySelectorAll(".check-prod");
-        var bar = document.getElementById("selectionBar");
-        var contador = document.getElementById("selCount");
-
-        // Destacar linhas selecionadas
-        document.querySelectorAll(".check-prod").forEach(function (cb) {
-          var row = document.getElementById(
-            "row-" + cb.getAttribute("data-id"),
-          );
-          if (cb.checked) {
-            row.classList.add("row-selected");
-          } else {
-            row.classList.remove("row-selected");
-          }
-        });
-
-        if (selecionados.length > 0) {
-          bar.classList.add("show");
-          contador.textContent = selecionados.length;
-        } else {
-          bar.classList.remove("show");
-        }
-
-        // Atualizar "selecionar todos"
-        document.getElementById("checkAll").checked =
-          selecionados.length === total.length && total.length > 0;
-      }
-
-      function toggleTodos(checkboxTodos) {
-        document.querySelectorAll(".check-prod").forEach(function (cb) {
-          cb.checked = checkboxTodos.checked;
-        });
-        atualizarSelecao();
-      }
-
-      function desmarcarTodos() {
-        document.querySelectorAll(".check-prod").forEach(function (cb) {
-          cb.checked = false;
-        });
-        document.getElementById("checkAll").checked = false;
-        atualizarSelecao();
-      }
-
-      function esconderSelectionBar() {
-        document.getElementById("selectionBar").classList.remove("show");
-      }
-
-      // ──────────────────────────────────────────────
-      // EXCLUSÃO COM CHECKBOX (requisito da aula)
-      // ──────────────────────────────────────────────
-      function excluirSelecionados() {
-        var selecionados = document.querySelectorAll(".check-prod:checked");
-
-        if (selecionados.length === 0) return;
-
-        if (
-          !confirm(
-            "Deseja excluir " +
-              selecionados.length +
-              " produto(s) selecionado(s)?",
-          )
-        )
-          return;
-
-        // Coletar os IDs selecionados
-        var idsSelecionados = [];
-        selecionados.forEach(function (cb) {
-          idsSelecionados.push(parseInt(cb.getAttribute("data-id")));
-        });
-
-        // Filtrar o vetor: manter apenas quem NÃO está na lista de selecionados
-        produtos = produtos.filter(function (p) {
-          return idsSelecionados.indexOf(p.id) === -1;
-        });
-
-        renderizarTabela();
-        atualizarDashboard();
-      }
-
-      // ──────────────────────────────────────────────
-      // EXCLUSÃO INDIVIDUAL
-      // ──────────────────────────────────────────────
-      function excluirUm(id) {
-        var produto = produtos.find(function (p) {
-          return p.id === id;
-        });
-        if (!confirm('Excluir "' + produto.nome + '"?')) return;
-
-        produtos = produtos.filter(function (p) {
-          return p.id !== id;
-        });
-        renderizarTabela();
-      }
-
-      // ──────────────────────────────────────────────
-      // EDITAR (modo simples: preenche o formulário)
-      // ──────────────────────────────────────────────
-      function editarProduto(id) {
-        var p = produtos.find(function (x) {
-          return x.id === id;
-        });
-        if (!p) return;
-
-        document.getElementById("nomeProduto").value = p.nome;
-        document.getElementById("categoriaProduto").value = p.categoria;
-        document.getElementById("descProduto").value = p.desc;
-        document.getElementById("precoProduto").value =
-          "R$ " + p.preco.toFixed(2).replace(".", ",");
-        document.getElementById("statusProduto").value = p.status;
-
-        // Remove o produto para ser recadastrado ao salvar
-        produtos = produtos.filter(function (x) {
-          return x.id !== id;
-        });
-        renderizarTabela();
-
-        // Scroll para o formulário
-        document
-          .getElementById("nomeProduto")
-          .scrollIntoView({ behavior: "smooth" });
-        document.getElementById("nomeProduto").focus();
-      }
-
-      // ──────────────────────────────────────────────
-      // CADASTRAR PRODUTO
-      // ──────────────────────────────────────────────
-      function mascaraMoeda(input) {
-        var apenasDigitos = input.value.replace(/\D/g, "");
-        var numero = (parseInt(apenasDigitos, 10) || 0) / 100;
-        input.value = numero.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        });
-      }
-
-      function limparErroCampo(id) {
-        document.getElementById(id).classList.remove("campo-invalido");
-        var span = document.getElementById("erro-" + id);
-        if (span) {
-          span.textContent = "";
-          span.classList.remove("show");
-        }
-        // id do span segue padrão "erroPrecoProduto" tbm
-        var span2 = document.getElementById(
-          "erro" + id.charAt(0).toUpperCase() + id.slice(1),
-        );
-        if (span2) {
-          span2.textContent = "";
-          span2.classList.remove("show");
-        }
-      }
-
-      function marcarErroCampo(inputId, spanId, msg) {
-        var input = document.getElementById(inputId);
-        var span = document.getElementById(spanId);
-        input.classList.add("campo-invalido");
-        span.textContent = msg;
-        span.classList.add("show");
-        input.focus();
-      }
-
-      function cadastrarProduto() {
-        var nome = document.getElementById("nomeProduto").value.trim();
-        var categoria = document.getElementById("categoriaProduto").value;
-        var desc = document.getElementById("descProduto").value.trim();
-        var precoRaw = document.getElementById("precoProduto").value.trim();
-        var precoNum = precoRaw
-          .replace("R$", "")
-          .replace(/\./g, "")
-          .replace(",", ".")
-          .trim();
-        var preco = parseFloat(precoNum);
-        var status = document.getElementById("statusProduto").value;
-
-        var alertOk = document.getElementById("alertOk");
-        var alertErr = document.getElementById("alertErr");
-
-        alertOk.classList.remove("show");
-        alertErr.classList.remove("show");
-        limparErroCampo("precoProduto");
-
-        // Validação do preço — cada caso tem sua mensagem
-        var precoValido = true;
-
-        if (precoRaw === "") {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "O preço é obrigatório.",
-          );
-          precoValido = false;
-        } else if (isNaN(preco)) {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "Digite apenas números. Ex: 29.90",
-          );
-          precoValido = false;
-        } else if (preco <= 0) {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "O preço deve ser maior que R$ 0,00.",
-          );
-          precoValido = false;
-        } else if (preco > 9999) {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "Valor muito alto. Máximo: R$ 9.999,00.",
-          );
-          precoValido = false;
-        }
-
-        if (!nome || !categoria || !precoValido) {
-          if (!precoValido && nome && categoria) return; // só o preço falhou, foco já foi dado
-          document.getElementById("alertErrMsg").textContent =
-            "Preencha todos os campos obrigatórios (*)";
-          alertErr.classList.add("show");
-          return;
-        }
-
-        var novo = {
-          id: proximoId++,
-          nome: nome,
-          categoria: categoria,
-          desc: desc || "Sem descrição.",
-          preco: preco,
-          status: status,
-        };
-
-        produtos.push(novo);
-        renderizarTabela();
-        limparFormulario();
-
-        alertOk.classList.add("show");
-        setTimeout(function () {
-          alertOk.classList.remove("show");
-        }, 3000);
-      }
-
-      // ──────────────────────────────────────────────
-      // LIMPAR FORMULÁRIO
-      // ──────────────────────────────────────────────
-      function limparFormulario() {
-        document.getElementById("nomeProduto").value = "";
-        document.getElementById("categoriaProduto").value = "";
-        document.getElementById("descProduto").value = "";
-        document.getElementById("precoProduto").value = "";
-        limparErroCampo("precoProduto");
-        document.getElementById("statusProduto").value = "Ativo";
-        document.getElementById("imgPreviewEl").style.display = "none";
-        document.getElementById("uploadLabel").textContent =
-          "Selecionar imagem";
-      }
-
-      // ──────────────────────────────────────────────
-      // PREVIEW IMAGEM
-      // ──────────────────────────────────────────────
-      document
-        .getElementById("imgProduto")
-        .addEventListener("change", function () {
-          var file = this.files[0];
-          if (!file) return;
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            var img = document.getElementById("imgPreviewEl");
-            img.src = e.target.result;
-            img.style.display = "block";
-          };
-          reader.readAsDataURL(file);
-          document.getElementById("uploadLabel").textContent = file.name;
-        });
-
-      // ──────────────────────────────────────────────
-      // ADICIONAR RELATÓRIO
-      // ──────────────────────────────────────────────
-      function adicionarRelatorio(input) {
-        var file = input.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var card = document.createElement("div");
-          card.className = "report-card";
-          card.innerHTML =
-            '<div class="report-img" style="background-image:url(' +
-            e.target.result +
-            ');background-size:cover;background-position:center;"></div>' +
-            '<div class="report-body"><h6>' +
-            file.name +
-            "</h6><p>Adicionado agora</p></div>";
-          document.getElementById("reportGrid").prepend(card);
-        };
-        reader.readAsDataURL(file);
-      }
-
-      // ──────────────────────────────────────────────
-      // INIT
-      // ──────────────────────────────────────────────
-      atualizarDashboard();
-    </script>
+    <script src="/JS/scripts/pageAdm.js"></script>
   </body>
 </html>

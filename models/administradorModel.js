@@ -34,6 +34,9 @@ class Administrador {
     this.#emailAdm = valor;
   }
 
+  get senhaAdm() {
+    return this.#senhaAdm;
+  }
   set senhaAdm(valor) {
     this.#senhaAdm = valor;
   }
@@ -64,7 +67,7 @@ class Administrador {
   }
 
   async listar() {
-    let sql = "select * from ADMINISTRADOR";
+    let sql = "select ID_ADM, NOME_ADM, EMAIL_ADM from ADMINISTRADOR";
 
     let banco = new Database();
     let linhas = await banco.ExecutaComando(sql);

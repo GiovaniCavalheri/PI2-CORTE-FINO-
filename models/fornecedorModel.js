@@ -6,13 +6,22 @@ class Fornecedor {
   #nomeFornecedor;
   #emailFornecedor;
   #telefone;
+  #senhaFornecedor;
 
-  constructor(id, cnpjFornecedor, nomeFornecedor, emailFornecedor, telefone) {
+  constructor(
+    id,
+    cnpjFornecedor,
+    nomeFornecedor,
+    emailFornecedor,
+    telefone,
+    senhaFornecedor,
+  ) {
     this.#id = id;
     this.#cnpjFornecedor = cnpjFornecedor;
     this.#nomeFornecedor = nomeFornecedor;
     this.#emailFornecedor = emailFornecedor;
     this.#telefone = telefone;
+    this.#senhaFornecedor = senhaFornecedor;
   }
 
   get id() {
@@ -48,6 +57,13 @@ class Fornecedor {
   }
   set telefone(valor) {
     this.#telefone = valor;
+  }
+
+  get senhaFornecedor() {
+    return this.#senhaFornecedor;
+  }
+  set senhaFornecedor(valor) {
+    this.#senhaFornecedor = valor;
   }
 
   async cadastrar() {
@@ -91,6 +107,7 @@ class Fornecedor {
         linha["NOME_FORNECEDOR"],
         linha["EMAIL_FORNECEDOR"],
         linha["TELEFONE"],
+        linha["SENHA_FORNECEDOR"],
       );
 
       lista.push(fornecedor);

@@ -53,7 +53,7 @@ function adicionarAoCarrinho(botao) {
 
 function feedbackBotao(botao) {
   const textoOriginal = botao.textContent;
-  botao.textContent = "✓ Adicionado!";
+  botao.textContent = "Adicionado!";
   botao.disabled = true;
   botao.style.background = "#4a9e6f"; 
 

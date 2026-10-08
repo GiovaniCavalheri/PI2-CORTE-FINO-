@@ -24,8 +24,8 @@ git config --list
 ## 2. Clonando o Repositório (apenas uma vez por máquina)
 
 ```bash
-git clone https://github.com/GiovaniCavalheri/PI-CORTE-FINO-REFAT.git
-cd PI-CORTE-FINO-REFAT
+git clone https://github.com/GiovaniCavalheri/PI2-CORTE-FINO-.git
+cd PI2-CORTE-FINO
 ```
 
 > O `clone` cria uma cópia completa do projeto na sua máquina.

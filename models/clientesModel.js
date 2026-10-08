@@ -7,6 +7,7 @@ class Cliente {
   #enderecoCliente;
   #telefone;
   #telComercial;
+  #senhaCliente;
 
   constructor(
     id,
@@ -15,6 +16,7 @@ class Cliente {
     enderecoCliente,
     telefone,
     telComercial,
+    senhaCliente,
   ) {
     this.#id = id;
     this.#cpfCliente = cpfCliente;
@@ -22,6 +24,7 @@ class Cliente {
     this.#enderecoCliente = enderecoCliente;
     this.#telefone = telefone;
     this.#telComercial = telComercial;
+    this.#senhaCliente = senhaCliente;
   }
 
   get id() {
@@ -66,6 +69,13 @@ class Cliente {
     this.#telComercial = valor;
   }
 
+  get senhaCliente() {
+    return this.#senhaCliente;
+  }
+  set senhaCliente(valor) {
+    this.#senhaCliente = valor;
+  }
+
   async cadastrar() {
     let sql =
       "insert into CLIENTE (CPF_CLIENTE, EMAIL_CLIENTE, ENDERECO_CLIENTE, TELEFONE, TEL_COMERCIAL) values (?,?,?,?,?)";
@@ -81,6 +91,21 @@ class Cliente {
     let result = await banco.ExecutaComandoNonQuery(sql, valores);
 
     return result;
+  }
+
+  async cadastrarComId() {
+    let sql =
+      "insert into CLIENTE (CPF_CLIENTE, EMAIL_CLIENTE, ENDERECO_CLIENTE, TELEFONE, TEL_COMERCIAL) values (?,?,?,?,?)";
+    let valores = [
+      this.#cpfCliente,
+      this.#emailCliente,
+      this.#enderecoCliente,
+      this.#telefone,
+      this.#telComercial,
+    ];
+
+    let banco = new Database();
+    return banco.ExecutaComandoLastInserted(sql, valores);
   }
 
   async excluir(id) {
@@ -109,6 +134,7 @@ class Cliente {
         linha["ENDERECO_CLIENTE"],
         linha["TELEFONE"],
         linha["TEL_COMERCIAL"],
+        linha["SENHA_CLIENTE"],
       );
 
       lista.push(cliente);

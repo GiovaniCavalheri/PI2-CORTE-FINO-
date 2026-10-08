@@ -1,4 +1,3 @@
-// ── NAVEGAÇÃO ──
 const titles = {
   dashboard: "Dashboard",
   produtos: "Produtos",

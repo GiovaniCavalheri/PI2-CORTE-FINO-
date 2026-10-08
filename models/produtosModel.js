@@ -146,6 +146,21 @@ class Produtos {
 
     return result;
   }
+
+  //listagem com JOIN para trazer o nome da categoria e da marca
+  async listarDetalhado() {
+    let sql =
+      "select p.ID_PRODUTO, p.NOME_PRODUTO, p.DESCRICAO, p.PRECO_VENDA, p.QNT_ESTOQUE, " +
+      "p.ID_CATEGORIA, p.ID_MARCA, c.NOME_CATEGORIA, m.NOME_MARCA " +
+      "from PRODUTOS p " +
+      "inner join CATEGORIAS_PRODUTO c on p.ID_CATEGORIA = c.ID_CATEGORIA " +
+      "inner join MARCA m on p.ID_MARCA = m.ID_MARCA";
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql);
+
+    return linhas;
+  }
 }
 
 module.exports = Produtos;

@@ -6,7 +6,7 @@
     <title>Corte Fino — Painel Admin</title>
     <link
       rel="shortcut icon"
-      href="/src/public/icon-Corte-Fino.ico"
+      href="/images/icon-Corte-Fino.ico"
       type="image/x-icon"
     />
     <link
@@ -941,13 +941,16 @@
         <a class="nav-link-cf" data-section="produtos">
           <i class="fa-solid fa-box-open"></i> Produtos
         </a>
+        <a class="nav-link-cf" data-section="cadastros">
+          <i class="fa-solid fa-tags"></i> Categorias e Marcas
+        </a>
         <a class="nav-link-cf" data-section="relatorios">
-          <i class="fa-solid fa-chart-pie"></i> Relatórios
+          <i class="fa-solid fa-chart-pie"></i> Relatorios
         </a>
       </nav>
 
       <div class="sidebar-footer">
-        <a href="/index.html">
+        <a href="/">
           <i class="fa-solid fa-arrow-left"></i> Voltar ao Site
         </a>
       </div>
@@ -981,22 +984,22 @@
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
             <div>
-              <div class="stat-value" id="dashTotal">—</div>
+              <div class="stat-value"><%= produtos.length %></div>
               <div class="stat-label">Produtos cadastrados</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
             <div>
-              <div class="stat-value" id="dashDestaques">—</div>
-              <div class="stat-label">Destaques da semana</div>
+              <div class="stat-value"><%= categorias.length %></div>
+              <div class="stat-label">Categorias cadastradas</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fa-solid fa-tag"></i></div>
             <div>
-              <div class="stat-value" id="dashAtivos">—</div>
-              <div class="stat-label">Produtos ativos</div>
+              <div class="stat-value"><%= marcas.length %></div>
+              <div class="stat-label">Marcas cadastradas</div>
             </div>
           </div>
           <div class="stat-card">
@@ -1049,23 +1052,18 @@
 
       <!-- ═══════ PRODUTOS ═══════ -->
       <div class="page-content" id="section-produtos">
-        <!-- FORMULÁRIO -->
+        <!-- FORMULARIO DE PRODUTO -->
         <div class="section-header">
           <div class="section-title">
-            <i class="fa-solid fa-plus-circle"></i> Cadastrar Produto
+            <i class="fa-solid fa-plus-circle"></i>
+            <span id="tituloForm">Cadastrar Produto</span>
           </div>
         </div>
 
-        <div id="alertOk" class="alert-cf">
-          <i class="fa-solid fa-circle-check"></i> Produto cadastrado com
-          sucesso!
-        </div>
-        <div id="alertErr" class="alert-err">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span id="alertErrMsg">Preencha os campos obrigatórios.</span>
-        </div>
-
         <div class="form-card">
+          <!-- guarda o id quando estamos editando um produto -->
+          <input type="hidden" id="idProduto" value="" />
+
           <div class="form-row cols-2">
             <div>
               <label class="form-label">Nome do Produto *</label>
@@ -1079,142 +1077,247 @@
               <label class="form-label">Categoria *</label>
               <select id="categoriaProduto">
                 <option value="">Selecione...</option>
-                <option>Bovino</option>
-                <option>Suíno</option>
-                <option>Frango</option>
-                <option>Especial</option>
-                <option>Embutidos</option>
-                <option>Aves</option>
+                <% for (let i = 0; i < categorias.length; i++) { %>
+                <option value="<%= categorias[i].id %>">
+                  <%= categorias[i].nomeCategoria %>
+                </option>
+                <% } %>
               </select>
             </div>
           </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Marca *</label>
+              <select id="marcaProduto">
+                <option value="">Selecione...</option>
+                <% for (let i = 0; i < marcas.length; i++) { %>
+                <option value="<%= marcas[i].id %>">
+                  <%= marcas[i].nomeMarca %>
+                </option>
+                <% } %>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Preco (R$/kg) *</label>
+              <input type="number" step="0.01" id="precoProduto" placeholder="0.00" />
+            </div>
+            <div>
+              <label class="form-label">Quantidade em estoque *</label>
+              <input type="number" id="estoqueProduto" placeholder="0" />
+            </div>
+          </div>
+
           <div class="form-row" style="margin-bottom: 16px">
             <div>
-              <label class="form-label">Descrição</label>
+              <label class="form-label">Descricao</label>
               <textarea
                 id="descProduto"
                 rows="2"
-                placeholder="Descrição breve..."
+                placeholder="Descricao breve..."
               ></textarea>
             </div>
           </div>
-          <div class="form-row cols-3">
-            <div>
-              <label class="form-label">Preço (R$/kg) *</label>
-              <input
-                type="text"
-                id="precoProduto"
-                placeholder="R$ 0,00"
-                inputmode="numeric"
-                oninput="
-                  mascaraMoeda(this);
-                  limparErroCampo('precoProduto');
-                "
-              />
-              <span class="msg-erro-campo" id="erroPrecoProduto"></span>
-            </div>
-            <div>
-              <label class="form-label">Status</label>
-              <select id="statusProduto">
-                <option value="Ativo">Ativo</option>
-                <option value="Destaque">Destaque da Semana</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">Imagem</label>
-              <label
-                class="upload-area"
-                for="imgProduto"
-                style="
-                  padding: 12px;
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-                  justify-content: center;
-                "
-              >
-                <i
-                  class="fa-solid fa-cloud-arrow-up"
-                  style="font-size: 18px; margin: 0"
-                ></i>
-                <span id="uploadLabel" style="font-size: 13px"
-                  >Selecionar imagem</span
-                >
-                <input type="file" id="imgProduto" accept="image/*" />
-              </label>
-            </div>
-          </div>
-          <img id="imgPreviewEl" src="" alt="Preview" />
+
           <div style="display: flex; gap: 10px; margin-top: 8px">
-            <button class="btn-red" onclick="cadastrarProduto()">
+            <button class="btn-red" id="btnGravar">
               <i class="fa-solid fa-floppy-disk"></i> Salvar Produto
             </button>
-            <button class="btn-outline" onclick="limparFormulario()">
-              Limpar
-            </button>
+            <button class="btn-outline" id="btnLimpar">Limpar</button>
           </div>
         </div>
 
-        <!-- TABELA COM CHECKBOX -->
+        <!-- TABELA DE PRODUTOS -->
         <div class="section-header">
           <div class="section-title">
             <i class="fa-solid fa-list-ul"></i> Produtos Cadastrados
           </div>
         </div>
 
-        <div id="selectionBar" class="selection-bar">
-          <span
-            ><i class="fa-solid fa-check-square" style="margin-right: 6px"></i
-            ><span id="selCount">0</span> produto(s) selecionado(s)</span
-          >
-          <div style="display: flex; gap: 8px">
-            <button class="btn-danger" onclick="excluirSelecionados()">
-              <i class="fa-solid fa-trash"></i> Excluir selecionados
-            </button>
-            <button class="btn-outline" onclick="desmarcarTodos()">
-              Cancelar
-            </button>
-          </div>
-        </div>
-
         <div class="table-wrap">
           <div class="table-toolbar">
             <div class="table-info">
-              Total: <strong id="totalProdutos">0</strong> produto(s)
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <label
-                style="
-                  font-size: 12px;
-                  color: var(--muted);
-                  display: flex;
-                  align-items: center;
-                  gap: 6px;
-                  cursor: pointer;
-                "
-              >
-                <input
-                  type="checkbox"
-                  id="checkAll"
-                  onclick="toggleTodos(this)"
-                />
-                Selecionar todos
-              </label>
+              Total: <strong><%= produtos.length %></strong> produto(s)
             </div>
           </div>
           <table>
             <thead>
               <tr>
-                <th style="width: 40px"></th>
                 <th>Produto</th>
                 <th>Categoria</th>
-                <th>Preço</th>
-                <th>Status</th>
-                <th style="width: 80px">Ações</th>
+                <th>Marca</th>
+                <th>Preco</th>
+                <th>Estoque</th>
+                <th style="width: 110px">Acoes</th>
               </tr>
             </thead>
-            <tbody id="tabelaProdutos"></tbody>
+            <tbody>
+              <% if (produtos.length == 0) { %>
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>Nenhum produto cadastrado ainda.</p>
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+
+              <% for (let i = 0; i < produtos.length; i++) { %>
+              <tr>
+                <td><%= produtos[i].NOME_PRODUTO %></td>
+                <td><%= produtos[i].NOME_CATEGORIA %></td>
+                <td><%= produtos[i].NOME_MARCA %></td>
+                <td>R$ <%= produtos[i].PRECO_VENDA %></td>
+                <td><%= produtos[i].QNT_ESTOQUE %></td>
+                <td>
+                  <button
+                    class="btn-outline btnEditar"
+                    data-id="<%= produtos[i].ID_PRODUTO %>"
+                    data-nome="<%= produtos[i].NOME_PRODUTO %>"
+                    data-categoria="<%= produtos[i].ID_CATEGORIA %>"
+                    data-marca="<%= produtos[i].ID_MARCA %>"
+                    data-preco="<%= produtos[i].PRECO_VENDA %>"
+                    data-estoque="<%= produtos[i].QNT_ESTOQUE %>"
+                    data-descricao="<%= produtos[i].DESCRICAO %>"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    class="btn-danger btnExcluir"
+                    data-id="<%= produtos[i].ID_PRODUTO %>"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======= CADASTROS (CATEGORIAS E MARCAS) ======= -->
+      <div class="page-content" id="section-cadastros">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-tags"></i> Categorias
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-row cols-2">
+            <div>
+              <label class="form-label">Nome da Categoria *</label>
+              <input type="text" id="nomeCategoria" placeholder="Ex: Bovino" />
+            </div>
+            <div>
+              <label class="form-label">Descricao</label>
+              <input
+                type="text"
+                id="descCategoria"
+                placeholder="Descricao breve..."
+              />
+            </div>
+          </div>
+          <div style="margin-top: 8px">
+            <button class="btn-red" id="btnGravarCategoria">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Categoria
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Descricao</th>
+                <th style="width: 80px">Acoes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (categorias.length == 0) { %>
+              <tr>
+                <td colspan="3">
+                  <div class="empty-state">
+                    <p>Nenhuma categoria cadastrada ainda.</p>
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+
+              <% for (let i = 0; i < categorias.length; i++) { %>
+              <tr>
+                <td><%= categorias[i].nomeCategoria %></td>
+                <td><%= categorias[i].descricao %></td>
+                <td>
+                  <button
+                    class="btn-danger btnExcluirCategoria"
+                    data-id="<%= categorias[i].id %>"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-header" style="margin-top: 28px">
+          <div class="section-title">
+            <i class="fa-solid fa-copyright"></i> Marcas
+          </div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-row">
+            <div>
+              <label class="form-label">Nome da Marca *</label>
+              <input type="text" id="nomeMarca" placeholder="Ex: Friboi" />
+            </div>
+          </div>
+          <div style="margin-top: 8px">
+            <button class="btn-red" id="btnGravarMarca">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Marca
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Marca</th>
+                <th style="width: 80px">Acoes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (marcas.length == 0) { %>
+              <tr>
+                <td colspan="2">
+                  <div class="empty-state">
+                    <p>Nenhuma marca cadastrada ainda.</p>
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+
+              <% for (let i = 0; i < marcas.length; i++) { %>
+              <tr>
+                <td><%= marcas[i].nomeMarca %></td>
+                <td>
+                  <button
+                    class="btn-danger btnExcluirMarca"
+                    data-id="<%= marcas[i].id %>"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
           </table>
         </div>
       </div>
@@ -1280,527 +1383,317 @@
     <!-- /main -->
 
     <script>
-      // ──────────────────────────────────────────────
-      // VETOR ESTÁTICO (simulação de banco de dados)
-      // ──────────────────────────────────────────────
-      var produtos = [
-        {
-          id: 1,
-          nome: "Picanha Premium",
-          categoria: "Bovino",
-          preco: 89.9,
-          status: "Destaque",
-          desc: "Corte nobre, marmoreio perfeito.",
-        },
-        {
-          id: 2,
-          nome: "Costela Bovina",
-          categoria: "Bovino",
-          preco: 45.9,
-          status: "Ativo",
-          desc: "Ideal para churrasco e panela.",
-        },
-        {
-          id: 3,
-          nome: "Frango Resfriado",
-          categoria: "Frango",
-          preco: 11.9,
-          status: "Destaque",
-          desc: "Frango inteiro, abatido no dia.",
-        },
-        {
-          id: 4,
-          nome: "Linguiça Toscana",
-          categoria: "Embutidos",
-          preco: 24.5,
-          status: "Ativo",
-          desc: "Artesanal, temperada na casa.",
-        },
-        {
-          id: 5,
-          nome: "Filé Mignon",
-          categoria: "Bovino",
-          preco: 119.9,
-          status: "Destaque",
-          desc: "O mais macio dos cortes bovinos.",
-        },
-        {
-          id: 6,
-          nome: "Pernil Suíno",
-          categoria: "Suíno",
-          preco: 28.9,
-          status: "Ativo",
-          desc: "Perfeito para assados.",
-        },
-        {
-          id: 7,
-          nome: "Coração de Frango",
-          categoria: "Aves",
-          preco: 14.9,
-          status: "Ativo",
-          desc: "Ótimo para churrasco.",
-        },
-        {
-          id: 8,
-          nome: "Alcatra Especial",
-          categoria: "Especial",
-          preco: 72.0,
-          status: "Ativo",
-          desc: "Selecionada para o clube.",
-        },
-        {
-          id: 9,
-          nome: "Calabresa Defumada",
-          categoria: "Embutidos",
-          preco: 19.9,
-          status: "Inativo",
-          desc: "Receita artesanal defumada.",
-        },
-        {
-          id: 10,
-          nome: "Costelinha Suína",
-          categoria: "Suíno",
-          preco: 38.5,
-          status: "Ativo",
-          desc: "Carnuda e saborosa.",
-        },
-      ];
-
-      var proximoId = 11;
-
-      // ──────────────────────────────────────────────
-      // NAVEGAÇÃO
-      // ──────────────────────────────────────────────
-      var sectionTitles = {
-        dashboard: "Painel",
-        produtos: "Produtos",
-        relatorios: "Relatórios",
-      };
-
-      function navigateTo(section) {
-        document.querySelectorAll(".page-content").forEach(function (el) {
-          el.classList.remove("active");
-        });
-        document.querySelectorAll(".nav-link-cf").forEach(function (el) {
-          el.classList.remove("active");
-        });
-        document.getElementById("section-" + section).classList.add("active");
+      document.addEventListener("DOMContentLoaded", function () {
+        // ──────────────────────────────────────────────
+        // SIDEBAR
+        // ──────────────────────────────────────────────
         document
-          .querySelector('[data-section="' + section + '"]')
-          .classList.add("active");
-        document.getElementById("topbarTitle").textContent =
-          sectionTitles[section] || section;
+          .querySelector("#toggleSidebar")
+          .addEventListener("click", function () {
+            var sidebar = document.querySelector("#sidebar");
+            var main = document.querySelector("#main");
 
-        if (section === "dashboard") atualizarDashboard();
-        if (section === "produtos") renderizarTabela();
-      }
+            if (window.innerWidth <= 768) {
+              sidebar.classList.toggle("open");
+            } else {
+              sidebar.classList.toggle("collapsed");
+              main.classList.toggle("expanded");
+            }
+          });
 
-      document.querySelectorAll(".nav-link-cf").forEach(function (link) {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
-          navigateTo(this.getAttribute("data-section"));
-        });
-      });
+        // ──────────────────────────────────────────────
+        // NAVEGACAO ENTRE AS SECOES
+        // ──────────────────────────────────────────────
+        var titulos = {
+          dashboard: "Painel",
+          produtos: "Produtos",
+          cadastros: "Categorias e Marcas",
+          relatorios: "Relatorios",
+        };
 
-      // ──────────────────────────────────────────────
-      // SIDEBAR TOGGLE
-      // ──────────────────────────────────────────────
-      document
-        .getElementById("toggleSidebar")
-        .addEventListener("click", function () {
-          var sidebar = document.getElementById("sidebar");
-          var main = document.getElementById("main");
-
-          if (window.innerWidth <= 768) {
-            sidebar.classList.toggle("open");
-          } else {
-            sidebar.classList.toggle("collapsed");
-            main.classList.toggle("expanded");
-          }
-        });
-
-      // ──────────────────────────────────────────────
-      // DASHBOARD
-      // ──────────────────────────────────────────────
-      function atualizarDashboard() {
-        document.getElementById("dashTotal").textContent = produtos.length;
-        document.getElementById("dashDestaques").textContent = produtos.filter(
-          function (p) {
-            return p.status === "Destaque";
-          },
-        ).length;
-        document.getElementById("dashAtivos").textContent = produtos.filter(
-          function (p) {
-            return p.status === "Ativo";
-          },
-        ).length;
-      }
-
-      // ──────────────────────────────────────────────
-      // RENDERIZAR TABELA
-      // ──────────────────────────────────────────────
-      function badgeStatus(status) {
-        if (status === "Ativo")
-          return '<span class="badge badge-ativo">Ativo</span>';
-        if (status === "Destaque")
-          return '<span class="badge badge-destaque">Destaque</span>';
-        return '<span class="badge badge-inativo">Inativo</span>';
-      }
-
-      function renderizarTabela() {
-        var tbody = document.getElementById("tabelaProdutos");
-        tbody.innerHTML = "";
-
-        if (produtos.length === 0) {
-          tbody.innerHTML =
-            '<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-box-open"></i><p>Nenhum produto cadastrado ainda.</p></div></td></tr>';
-          document.getElementById("totalProdutos").textContent = 0;
-          esconderSelectionBar();
-          return;
+        function navigateTo(secao) {
+          document.querySelectorAll(".page-content").forEach(function (el) {
+            el.classList.remove("active");
+          });
+          document.querySelectorAll(".nav-link-cf").forEach(function (el) {
+            el.classList.remove("active");
+          });
+          document.querySelector("#section-" + secao).classList.add("active");
+          document
+            .querySelector('[data-section="' + secao + '"]')
+            .classList.add("active");
+          document.querySelector("#topbarTitle").textContent = titulos[secao];
         }
 
-        produtos.forEach(function (p) {
-          var tr = document.createElement("tr");
-          tr.id = "row-" + p.id;
-          tr.innerHTML =
-            '<td><input type="checkbox" class="check-prod" data-id="' +
-            p.id +
-            '" onchange="atualizarSelecao()" /></td>' +
-            "<td><strong>" +
-            p.nome +
-            '</strong><br><span style="font-size:12px;color:var(--muted);">' +
-            p.desc +
-            "</span></td>" +
-            '<td><span class="badge badge-cat">' +
-            p.categoria +
-            "</span></td>" +
-            '<td class="price-text">R$ ' +
-            p.preco.toFixed(2).replace(".", ",") +
-            "/kg</td>" +
-            "<td>" +
-            badgeStatus(p.status) +
-            "</td>" +
-            "<td>" +
-            '<button class="action-btn" title="Editar" onclick="editarProduto(' +
-            p.id +
-            ')"><i class="fa-solid fa-pen"></i></button>' +
-            '<button class="action-btn del" title="Excluir" onclick="excluirUm(' +
-            p.id +
-            ')"><i class="fa-solid fa-trash"></i></button>' +
-            "</td>";
-          tbody.appendChild(tr);
+        // deixa a funcao disponivel para os botoes de acesso rapido
+        window.navigateTo = navigateTo;
+
+        document.querySelectorAll(".nav-link-cf").forEach(function (link) {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            navigateTo(this.getAttribute("data-section"));
+          });
         });
 
-        document.getElementById("totalProdutos").textContent = produtos.length;
-        document.getElementById("checkAll").checked = false;
-        atualizarDashboard();
-      }
+        // ──────────────────────────────────────────────
+        // PRODUTOS - GRAVAR (cadastrar ou alterar)
+        // ──────────────────────────────────────────────
+        var btnGravar = document.querySelector("#btnGravar");
+        btnGravar.addEventListener("click", gravarProduto);
 
-      // ──────────────────────────────────────────────
-      // SELEÇÃO COM CHECKBOX
-      // ──────────────────────────────────────────────
-      function atualizarSelecao() {
-        var selecionados = document.querySelectorAll(".check-prod:checked");
-        var total = document.querySelectorAll(".check-prod");
-        var bar = document.getElementById("selectionBar");
-        var contador = document.getElementById("selCount");
+        function gravarProduto() {
+          var id = document.querySelector("#idProduto");
+          var nome = document.querySelector("#nomeProduto");
+          var categoria = document.querySelector("#categoriaProduto");
+          var marca = document.querySelector("#marcaProduto");
+          var preco = document.querySelector("#precoProduto");
+          var estoque = document.querySelector("#estoqueProduto");
+          var descricao = document.querySelector("#descProduto");
 
-        // Destacar linhas selecionadas
-        document.querySelectorAll(".check-prod").forEach(function (cb) {
-          var row = document.getElementById(
-            "row-" + cb.getAttribute("data-id"),
-          );
-          if (cb.checked) {
-            row.classList.add("row-selected");
+          if (
+            nome.value != "" &&
+            categoria.value != "" &&
+            marca.value != "" &&
+            preco.value != "" &&
+            estoque.value != ""
+          ) {
+            // monta o objeto que sera enviado ao backend
+            var obj = {
+              id: id.value,
+              nome: nome.value,
+              categoria: categoria.value,
+              marca: marca.value,
+              preco: preco.value,
+              estoque: estoque.value,
+              descricao: descricao.value,
+            };
+
+            // se tem id preenchido estamos alterando, senao cadastrando
+            var url =
+              id.value == "" ? "/produto/cadastrar" : "/produto/alterar";
+
+            fetch(url, {
+              method: "POST",
+              body: JSON.stringify(obj),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(function (resposta) {
+                return resposta.json();
+              })
+              .then(function (corpoResposta) {
+                if (corpoResposta.ok) {
+                  alert("Produto gravado com sucesso!");
+                  window.location.reload();
+                } else {
+                  alert("Erro ao gravar o produto!");
+                }
+              });
           } else {
-            row.classList.remove("row-selected");
+            alert("Preencha corretamente todos os campos obrigatorios!");
           }
-        });
-
-        if (selecionados.length > 0) {
-          bar.classList.add("show");
-          contador.textContent = selecionados.length;
-        } else {
-          bar.classList.remove("show");
         }
 
-        // Atualizar "selecionar todos"
-        document.getElementById("checkAll").checked =
-          selecionados.length === total.length && total.length > 0;
-      }
-
-      function toggleTodos(checkboxTodos) {
-        document.querySelectorAll(".check-prod").forEach(function (cb) {
-          cb.checked = checkboxTodos.checked;
-        });
-        atualizarSelecao();
-      }
-
-      function desmarcarTodos() {
-        document.querySelectorAll(".check-prod").forEach(function (cb) {
-          cb.checked = false;
-        });
-        document.getElementById("checkAll").checked = false;
-        atualizarSelecao();
-      }
-
-      function esconderSelectionBar() {
-        document.getElementById("selectionBar").classList.remove("show");
-      }
-
-      // ──────────────────────────────────────────────
-      // EXCLUSÃO COM CHECKBOX (requisito da aula)
-      // ──────────────────────────────────────────────
-      function excluirSelecionados() {
-        var selecionados = document.querySelectorAll(".check-prod:checked");
-
-        if (selecionados.length === 0) return;
-
-        if (
-          !confirm(
-            "Deseja excluir " +
-              selecionados.length +
-              " produto(s) selecionado(s)?",
-          )
-        )
-          return;
-
-        // Coletar os IDs selecionados
-        var idsSelecionados = [];
-        selecionados.forEach(function (cb) {
-          idsSelecionados.push(parseInt(cb.getAttribute("data-id")));
-        });
-
-        // Filtrar o vetor: manter apenas quem NÃO está na lista de selecionados
-        produtos = produtos.filter(function (p) {
-          return idsSelecionados.indexOf(p.id) === -1;
-        });
-
-        renderizarTabela();
-        atualizarDashboard();
-      }
-
-      // ──────────────────────────────────────────────
-      // EXCLUSÃO INDIVIDUAL
-      // ──────────────────────────────────────────────
-      function excluirUm(id) {
-        var produto = produtos.find(function (p) {
-          return p.id === id;
-        });
-        if (!confirm('Excluir "' + produto.nome + '"?')) return;
-
-        produtos = produtos.filter(function (p) {
-          return p.id !== id;
-        });
-        renderizarTabela();
-      }
-
-      // ──────────────────────────────────────────────
-      // EDITAR (modo simples: preenche o formulário)
-      // ──────────────────────────────────────────────
-      function editarProduto(id) {
-        var p = produtos.find(function (x) {
-          return x.id === id;
-        });
-        if (!p) return;
-
-        document.getElementById("nomeProduto").value = p.nome;
-        document.getElementById("categoriaProduto").value = p.categoria;
-        document.getElementById("descProduto").value = p.desc;
-        document.getElementById("precoProduto").value =
-          "R$ " + p.preco.toFixed(2).replace(".", ",");
-        document.getElementById("statusProduto").value = p.status;
-
-        // Remove o produto para ser recadastrado ao salvar
-        produtos = produtos.filter(function (x) {
-          return x.id !== id;
-        });
-        renderizarTabela();
-
-        // Scroll para o formulário
+        // ──────────────────────────────────────────────
+        // PRODUTOS - LIMPAR O FORMULARIO
+        // ──────────────────────────────────────────────
         document
-          .getElementById("nomeProduto")
-          .scrollIntoView({ behavior: "smooth" });
-        document.getElementById("nomeProduto").focus();
-      }
+          .querySelector("#btnLimpar")
+          .addEventListener("click", limparFormulario);
 
-      // ──────────────────────────────────────────────
-      // CADASTRAR PRODUTO
-      // ──────────────────────────────────────────────
-      function mascaraMoeda(input) {
-        var apenasDigitos = input.value.replace(/\D/g, "");
-        var numero = (parseInt(apenasDigitos, 10) || 0) / 100;
-        input.value = numero.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        });
-      }
-
-      function limparErroCampo(id) {
-        document.getElementById(id).classList.remove("campo-invalido");
-        var span = document.getElementById("erro-" + id);
-        if (span) {
-          span.textContent = "";
-          span.classList.remove("show");
+        function limparFormulario() {
+          document.querySelector("#idProduto").value = "";
+          document.querySelector("#nomeProduto").value = "";
+          document.querySelector("#categoriaProduto").value = "";
+          document.querySelector("#marcaProduto").value = "";
+          document.querySelector("#precoProduto").value = "";
+          document.querySelector("#estoqueProduto").value = "";
+          document.querySelector("#descProduto").value = "";
+          document.querySelector("#tituloForm").textContent =
+            "Cadastrar Produto";
         }
-        // id do span segue padrão "erroPrecoProduto" tbm
-        var span2 = document.getElementById(
-          "erro" + id.charAt(0).toUpperCase() + id.slice(1),
+
+        // ──────────────────────────────────────────────
+        // PRODUTOS - EDITAR (preenche o formulario)
+        // ──────────────────────────────────────────────
+        var botoesEditar = document.querySelectorAll(".btnEditar");
+
+        for (var i = 0; i < botoesEditar.length; i++) {
+          botoesEditar[i].addEventListener("click", editarProduto);
+        }
+
+        function editarProduto() {
+          document.querySelector("#idProduto").value = this.dataset.id;
+          document.querySelector("#nomeProduto").value = this.dataset.nome;
+          document.querySelector("#categoriaProduto").value =
+            this.dataset.categoria;
+          document.querySelector("#marcaProduto").value = this.dataset.marca;
+          document.querySelector("#precoProduto").value = this.dataset.preco;
+          document.querySelector("#estoqueProduto").value =
+            this.dataset.estoque;
+          document.querySelector("#descProduto").value = this.dataset.descricao;
+          document.querySelector("#tituloForm").textContent = "Alterar Produto";
+
+          document
+            .querySelector("#nomeProduto")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+
+        // ──────────────────────────────────────────────
+        // PRODUTOS - EXCLUIR
+        // ──────────────────────────────────────────────
+        var botoesExcluir = document.querySelectorAll(".btnExcluir");
+
+        for (var j = 0; j < botoesExcluir.length; j++) {
+          botoesExcluir[j].addEventListener("click", excluirProduto);
+        }
+
+        function excluirProduto() {
+          var id = this.dataset.id;
+
+          if (confirm("Deseja realmente excluir este produto?")) {
+            fetch("/produto/excluir/" + id, { method: "DELETE" })
+              .then(function (resposta) {
+                return resposta.json();
+              })
+              .then(function (corpoResposta) {
+                if (corpoResposta.ok) {
+                  window.location.reload();
+                } else {
+                  alert("Erro ao excluir o produto!");
+                }
+              });
+          }
+        }
+
+        // ──────────────────────────────────────────────
+        // CATEGORIAS - GRAVAR
+        // ──────────────────────────────────────────────
+        document
+          .querySelector("#btnGravarCategoria")
+          .addEventListener("click", gravarCategoria);
+
+        function gravarCategoria() {
+          var nome = document.querySelector("#nomeCategoria");
+          var descricao = document.querySelector("#descCategoria");
+
+          if (nome.value != "") {
+            var obj = { nome: nome.value, descricao: descricao.value };
+
+            fetch("/categoria/cadastrar", {
+              method: "POST",
+              body: JSON.stringify(obj),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(function (resposta) {
+                return resposta.json();
+              })
+              .then(function (corpoResposta) {
+                if (corpoResposta.ok) {
+                  alert("Categoria cadastrada com sucesso!");
+                  window.location.reload();
+                } else {
+                  alert("Erro ao cadastrar a categoria!");
+                }
+              });
+          } else {
+            alert("Informe o nome da categoria!");
+          }
+        }
+
+        // ──────────────────────────────────────────────
+        // CATEGORIAS - EXCLUIR
+        // ──────────────────────────────────────────────
+        var botoesExcluirCategoria = document.querySelectorAll(
+          ".btnExcluirCategoria",
         );
-        if (span2) {
-          span2.textContent = "";
-          span2.classList.remove("show");
-        }
-      }
 
-      function marcarErroCampo(inputId, spanId, msg) {
-        var input = document.getElementById(inputId);
-        var span = document.getElementById(spanId);
-        input.classList.add("campo-invalido");
-        span.textContent = msg;
-        span.classList.add("show");
-        input.focus();
-      }
-
-      function cadastrarProduto() {
-        var nome = document.getElementById("nomeProduto").value.trim();
-        var categoria = document.getElementById("categoriaProduto").value;
-        var desc = document.getElementById("descProduto").value.trim();
-        var precoRaw = document.getElementById("precoProduto").value.trim();
-        var precoNum = precoRaw
-          .replace("R$", "")
-          .replace(/\./g, "")
-          .replace(",", ".")
-          .trim();
-        var preco = parseFloat(precoNum);
-        var status = document.getElementById("statusProduto").value;
-
-        var alertOk = document.getElementById("alertOk");
-        var alertErr = document.getElementById("alertErr");
-
-        alertOk.classList.remove("show");
-        alertErr.classList.remove("show");
-        limparErroCampo("precoProduto");
-
-        // Validação do preço — cada caso tem sua mensagem
-        var precoValido = true;
-
-        if (precoRaw === "") {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "O preço é obrigatório.",
-          );
-          precoValido = false;
-        } else if (isNaN(preco)) {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "Digite apenas números. Ex: 29.90",
-          );
-          precoValido = false;
-        } else if (preco <= 0) {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "O preço deve ser maior que R$ 0,00.",
-          );
-          precoValido = false;
-        } else if (preco > 9999) {
-          marcarErroCampo(
-            "precoProduto",
-            "erroPrecoProduto",
-            "Valor muito alto. Máximo: R$ 9.999,00.",
-          );
-          precoValido = false;
+        for (var k = 0; k < botoesExcluirCategoria.length; k++) {
+          botoesExcluirCategoria[k].addEventListener("click", excluirCategoria);
         }
 
-        if (!nome || !categoria || !precoValido) {
-          if (!precoValido && nome && categoria) return; // só o preço falhou, foco já foi dado
-          document.getElementById("alertErrMsg").textContent =
-            "Preencha todos os campos obrigatórios (*)";
-          alertErr.classList.add("show");
-          return;
+        function excluirCategoria() {
+          var id = this.dataset.id;
+
+          if (confirm("Deseja realmente excluir esta categoria?")) {
+            fetch("/categoria/excluir/" + id, { method: "DELETE" })
+              .then(function (resposta) {
+                return resposta.json();
+              })
+              .then(function (corpoResposta) {
+                if (corpoResposta.ok) {
+                  window.location.reload();
+                } else {
+                  alert(
+                    "Erro ao excluir! Verifique se existe produto usando esta categoria.",
+                  );
+                }
+              });
+          }
         }
 
-        var novo = {
-          id: proximoId++,
-          nome: nome,
-          categoria: categoria,
-          desc: desc || "Sem descrição.",
-          preco: preco,
-          status: status,
-        };
+        // ──────────────────────────────────────────────
+        // MARCAS - GRAVAR
+        // ──────────────────────────────────────────────
+        document
+          .querySelector("#btnGravarMarca")
+          .addEventListener("click", gravarMarca);
 
-        produtos.push(novo);
-        renderizarTabela();
-        limparFormulario();
+        function gravarMarca() {
+          var nome = document.querySelector("#nomeMarca");
 
-        alertOk.classList.add("show");
-        setTimeout(function () {
-          alertOk.classList.remove("show");
-        }, 3000);
-      }
+          if (nome.value != "") {
+            var obj = { nome: nome.value };
 
-      // ──────────────────────────────────────────────
-      // LIMPAR FORMULÁRIO
-      // ──────────────────────────────────────────────
-      function limparFormulario() {
-        document.getElementById("nomeProduto").value = "";
-        document.getElementById("categoriaProduto").value = "";
-        document.getElementById("descProduto").value = "";
-        document.getElementById("precoProduto").value = "";
-        limparErroCampo("precoProduto");
-        document.getElementById("statusProduto").value = "Ativo";
-        document.getElementById("imgPreviewEl").style.display = "none";
-        document.getElementById("uploadLabel").textContent =
-          "Selecionar imagem";
-      }
+            fetch("/marca/cadastrar", {
+              method: "POST",
+              body: JSON.stringify(obj),
+              headers: { "Content-Type": "application/json" },
+            })
+              .then(function (resposta) {
+                return resposta.json();
+              })
+              .then(function (corpoResposta) {
+                if (corpoResposta.ok) {
+                  alert("Marca cadastrada com sucesso!");
+                  window.location.reload();
+                } else {
+                  alert("Erro ao cadastrar a marca!");
+                }
+              });
+          } else {
+            alert("Informe o nome da marca!");
+          }
+        }
 
-      // ──────────────────────────────────────────────
-      // PREVIEW IMAGEM
-      // ──────────────────────────────────────────────
-      document
-        .getElementById("imgProduto")
-        .addEventListener("change", function () {
-          var file = this.files[0];
-          if (!file) return;
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            var img = document.getElementById("imgPreviewEl");
-            img.src = e.target.result;
-            img.style.display = "block";
-          };
-          reader.readAsDataURL(file);
-          document.getElementById("uploadLabel").textContent = file.name;
-        });
+        // ──────────────────────────────────────────────
+        // MARCAS - EXCLUIR
+        // ──────────────────────────────────────────────
+        var botoesExcluirMarca = document.querySelectorAll(".btnExcluirMarca");
 
-      // ──────────────────────────────────────────────
-      // ADICIONAR RELATÓRIO
-      // ──────────────────────────────────────────────
-      function adicionarRelatorio(input) {
-        var file = input.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var card = document.createElement("div");
-          card.className = "report-card";
-          card.innerHTML =
-            '<div class="report-img" style="background-image:url(' +
-            e.target.result +
-            ');background-size:cover;background-position:center;"></div>' +
-            '<div class="report-body"><h6>' +
-            file.name +
-            "</h6><p>Adicionado agora</p></div>";
-          document.getElementById("reportGrid").prepend(card);
-        };
-        reader.readAsDataURL(file);
-      }
+        for (var m = 0; m < botoesExcluirMarca.length; m++) {
+          botoesExcluirMarca[m].addEventListener("click", excluirMarca);
+        }
 
-      // ──────────────────────────────────────────────
-      // INIT
-      // ──────────────────────────────────────────────
-      atualizarDashboard();
+        function excluirMarca() {
+          var id = this.dataset.id;
+
+          if (confirm("Deseja realmente excluir esta marca?")) {
+            fetch("/marca/excluir/" + id, { method: "DELETE" })
+              .then(function (resposta) {
+                return resposta.json();
+              })
+              .then(function (corpoResposta) {
+                if (corpoResposta.ok) {
+                  window.location.reload();
+                } else {
+                  alert(
+                    "Erro ao excluir! Verifique se existe produto usando esta marca.",
+                  );
+                }
+              });
+          }
+        }
+      });
     </script>
   </body>
 </html>

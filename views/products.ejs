@@ -12,7 +12,7 @@
     />
 
     <!-- FAVICON -->
-    <link rel="shortcut icon" href="/src/public/icon-Corte-Fino.ico" />
+    <link rel="shortcut icon" href="/images/icon-Corte-Fino.ico" />
 
     <!-- ICONES -->
     <link
@@ -32,8 +32,8 @@
     />
 
     <!-- CSS (PADRÃO DO INDEX) -->
-    <script type="module" src="/src/main.js"></script>
-    <link rel="stylesheet" href="/src/style.css" />
+    
+    <link rel="stylesheet" href="/CSS/style.css" />
   </head>
   <body>
     <!-- HEADER TOP - Informações de contato -->
@@ -50,9 +50,9 @@
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg main-header sticky-top">
       <div class="container">
-        <a class="navbar-brand logo-area" href="/index.html">
+        <a class="navbar-brand logo-area" href="/">
           <img
-            src="/src/public/logo-c-f.png"
+            src="/images/logo-c-f.png"
             style="height: 60px"
             alt="Logo Corte Fino"
           />
@@ -69,40 +69,40 @@
         <div class="collapse navbar-collapse" id="menuPrincipal">
           <ul class="nav nav-pills ms-auto">
             <li class="nav-item">
-              <a href="/index.html" class="nav-link active" aria-current="page"
+              <a href="/" class="nav-link active" aria-current="page"
                 >Início</a
               >
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/products.html" class="nav-link"
+              <a href="/products" class="nav-link"
                 >Produtos</a
               >
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/offers.html" class="nav-link">Ofertas</a>
+              <a href="/offers" class="nav-link">Ofertas</a>
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/about.html" class="nav-link">Sobre Nós</a>
+              <a href="/about" class="nav-link">Sobre Nós</a>
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/services.html" class="nav-link"
+              <a href="/services" class="nav-link"
                 >Serviços</a
               >
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/contact.html" class="nav-link">Contato</a>
+              <a href="/contact" class="nav-link">Contato</a>
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/signatures.html" class="nav-link"
+              <a href="/signatures" class="nav-link"
                 >Assinaturas</a
               >
             </li>
             <li class="nav-item">
-              <a href="/src/Interface/cart.html" class="nav-link">Carrinho</a>
+              <a href="/cart" class="nav-link">Carrinho</a>
             </li>
             <li class="nav-item">
               <a
-                href="/src/Interface/Join.html"
+                href="/join"
                 class="nav-link destaque-vermelho"
                 >Entrar</a
               >
@@ -148,120 +148,36 @@
         </button>
       </div>
 
-      <!-- GRID -->
+      <!-- GRID - produtos vindos do banco de dados -->
       <section class="grid-produtos" id="listaProdutos">
-        <!-- PRODUTO 1 -->
-        <div class="cartao-produto" data-tipo="bovino">
+        <% if (produtos.length == 0) { %>
+        <p>Nenhum produto cadastrado no momento.</p>
+        <% } %>
+
+        <% for (let i = 0; i < produtos.length; i++) { %>
+        <div class="cartao-produto">
           <div class="area-img-produto">
-            <span class="badge-oferta">Oferta</span>
             <img
-              src="/src/public/Cards-Produtos/picanha-bovina-card.png"
+              src="/images/Cards-Produtos/picanha-bovina-card.png"
               class="img-produto"
-              alt="Picanha Premium"
+              alt="<%= produtos[i].NOME_PRODUTO %>"
             />
           </div>
 
           <div class="info-produto">
-            <span class="categoria-produto">Bovino</span>
-            <h3 class="nome-produto">Picanha Premium</h3>
-            <p class="descricao-produto">
-              Picanha argentina macia e suculenta.
-            </p>
+            <span class="categoria-produto"><%= produtos[i].NOME_CATEGORIA %></span>
+            <h3 class="nome-produto"><%= produtos[i].NOME_PRODUTO %></h3>
+            <p class="descricao-produto"><%= produtos[i].DESCRICAO %></p>
 
             <div class="preco-produto">
-              <span class="preco-antigo">R$ 109,90</span>
-              <span class="preco-atual">R$ 89,90</span>
+              <span class="preco-atual">R$ <%= produtos[i].PRECO_VENDA %></span>
               <span class="unidade-preco">/kg</span>
             </div>
 
             <button class="btn-adicionar">Adicionar ao Pedido</button>
           </div>
         </div>
-
-        <!-- PRODUTO 2 -->
-        <div class="cartao-produto" data-tipo="bovino">
-          <img
-            src="/src/public/Cards-Produtos/costela-procuts.png"
-            class="img-produto"
-            alt="Costela Bovina"
-          />
-          <div class="info-produto">
-            <span class="categoria-produto">Bovino</span>
-            <h3 class="nome-produto">Costela Bovina</h3>
-            <p class="descricao-produto">Costela perfeita para churrasco.</p>
-
-            <div class="preco-produto">
-              <span class="preco-atual">R$ 45,90</span>
-              <span class="unidade-preco">/kg</span>
-            </div>
-
-            <button class="btn-adicionar">Adicionar ao Pedido</button>
-          </div>
-        </div>
-
-        <!-- PRODUTO 3 -->
-        <div class="cartao-produto" data-tipo="aves">
-          <img
-            src="/src/public/Cards-Produtos/frango-resfriado-products.png"
-            class="img-produto"
-            alt="Frango Resfriado"
-          />
-          <div class="info-produto">
-            <span class="categoria-produto">Aves</span>
-            <h3 class="nome-produto">Frango Resfriado</h3>
-            <p class="descricao-produto">Ideal para receitas do dia a dia.</p>
-
-            <div class="preco-produto">
-              <span class="preco-atual">R$ 11,90</span>
-              <span class="unidade-preco">/kg</span>
-            </div>
-
-            <button class="btn-adicionar">Adicionar ao Pedido</button>
-          </div>
-        </div>
-
-        <!-- PRODUTO 4 -->
-        <div class="cartao-produto" data-tipo="kits">
-          <img
-            src="/src/public/Cards-Produtos/kit-churrasco-products.png"
-            class="img-produto"
-            alt="Kits Especiais para churrasco"
-          />
-          <div class="info-produto">
-            <span class="categoria-produto">Kits Especiais</span>
-            <h3 class="nome-produto">Kit Para Churrasco</h3>
-            <p class="descricao-produto">Ideal para compartilhar.</p>
-
-            <div class="preco-produto">
-              <span class="preco-atual">R$ 149,90</span>
-              <span class="unidade-preco">/kg</span>
-            </div>
-
-            <button class="btn-adicionar">Adicionar ao Pedido</button>
-          </div>
-        </div>
-
-        <!-- Produto 5 -->
-
-        <div class="cartao-produto" data-tipo="suino">
-          <img
-            src="/src/public/Cards-Produtos/panceta-products.png"
-            class="img-produto"
-            alt="Kits Especiais para churrasco"
-          />
-          <div class="info-produto">
-            <span class="categoria-produto">Suíno</span>
-            <h3 class="nome-produto">Panceta Premium</h3>
-            <p class="descricao-produto">Panceta deliciosa e suculenta.</p>
-
-            <div class="preco-produto">
-              <span class="preco-atual">R$ 39,90</span>
-              <span class="unidade-preco">/kg</span>
-            </div>
-
-            <button class="btn-adicionar">Adicionar ao Pedido</button>
-          </div>
-        </div>
+        <% } %>
       </section>
     </main>
     <!-- FOOTER -->
@@ -278,12 +194,12 @@
           <div class="col-12 col-sm-6 col-lg-3">
             <h2 class="fs-5 fw-bold mb-3">Links Rápidos</h2>
             <ul class="list-unstyled footer-links">
-              <li><a href="/src/Interface/products.html">Produtos</a></li>
-              <li><a href="/src/Interface/offers.html">Ofertas</a></li>
-              <li><a href="/src/Interface/about.html">Sobre Nós</a></li>
-              <li><a href="/src/Interface/services.html">Serviços</a></li>
-              <li><a href="/src/Interface/contact.html">Contato</a></li>
-              <li><a href="/src/Interface/signatures.html">Assinaturas</a></li>
+              <li><a href="/products">Produtos</a></li>
+              <li><a href="/offers">Ofertas</a></li>
+              <li><a href="/about">Sobre Nós</a></li>
+              <li><a href="/services">Serviços</a></li>
+              <li><a href="/contact">Contato</a></li>
+              <li><a href="/signatures">Assinaturas</a></li>
               <li>
                 <a href="#logout"
                   ><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a
@@ -324,7 +240,7 @@
         </p>
       </div>
     </footer>
-    <script src="../scripts/cart.js"></script>
-    <script src="../scripts/products.js" defer></script>
+    <script src="/JS/scripts/cart.js"></script>
+    <script src="/JS/scripts/products.js" defer></script>
   </body>
 </html>

@@ -60,6 +60,14 @@
   color: var(--cor-vermelho);
 }
 
+.logo-area img {
+  height: 60px;
+}
+
+.footer-copyright {
+  font-size: 13px;
+}
+
 .nav-link {
   color: var(--cor-texto-escuro) !important;
   font-size: 15px;
@@ -1450,5 +1458,4 @@
 
   box-shadow: 0 15px 35px rgba(122, 29, 29, 0.25);
 }
-
 

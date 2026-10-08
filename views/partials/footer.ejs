@@ -1,0 +1,67 @@
+<% if (footerType === "compact") { %>
+<footer class="section-footer py-5">
+  <div class="container">
+    <hr class="footer-hr mt-4" />
+    <p class="text-center footer-text footer-copyright mt-3 mb-0">
+      © 2025 Açougue Corte Fino. Todos os direitos reservados.
+    </p>
+  </div>
+</footer>
+<% } else { %>
+<footer class="section-footer py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-12 col-sm-6 col-lg-3">
+        <h2 class="fs-5 fw-bold mb-3">Corte Fino</h2>
+        <p class="footer-text">
+          <%= footerType === "contact" ? "Qualidade e frescor premium em cada corte. Tradição e excelência desde 1995." : "Qualidade e Frescor premium em cada corte. Tradição e excelência desde 1995." %>
+        </p>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <h2 class="fs-5 fw-bold mb-3">Links Rápidos</h2>
+        <ul class="list-unstyled footer-links">
+          <li><a href="/products">Produtos</a></li>
+          <li><a href="/offers">Ofertas</a></li>
+          <li><a href="/about">Sobre Nós</a></li>
+          <li><a href="/services">Serviços</a></li>
+          <li><a href="/contact">Contato</a></li>
+          <li><a href="/signatures">Assinaturas</a></li>
+          <% if (footerType !== "contact") { %>
+          <li>
+            <a href="#logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
+          </li>
+          <% } %>
+        </ul>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <h2 class="fs-5 fw-bold mb-3">Contato</h2>
+        <p class="footer-text">
+          <i class="fa-solid fa-phone me-2"></i>(18) 4002-8922
+        </p>
+        <p class="footer-text">
+          <i class="fa-solid fa-envelope me-2"></i>
+          <a href="mailto:cortefinoprimary@gmail.com">cortefinoprimary@gmail.com</a>
+        </p>
+        <p class="footer-text">
+          <i class="fa-solid fa-location-dot me-2"></i>
+          <%= footerType === "contact" || footerType === "signatures" ? "Rua dos Girassóis, 124" : "Rua dos Girassois, 124" %><% if (footerType === "contact") { %> — <% } else { %><br /><% } %>Presidente Prudente - SP
+        </p>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <h2 class="fs-5 fw-bold mb-3"><%= footerType === "signatures" ? "Funcionamento" : "Horário de Funcionamento" %></h2>
+        <p class="footer-text">
+          <i class="fa-solid fa-clock me-2"></i><%= footerType === "contact" ? "Seg-Sab: 7h – 19h" : "Seg-Sáb: 7h às 19h" %><br />
+          <%= footerType === "contact" ? "Domingo: 7h – 13h" : "Domingo: 7h às 13h" %>
+        </p>
+        <p class="footer-text">
+          <i class="fa-brands fa-instagram me-2"></i><%= footerType === "contact" || footerType === "signatures" ? "@cortefino" : "Corte Fino" %>
+        </p>
+      </div>
+    </div>
+    <hr class="footer-hr mt-4" />
+    <p class="text-center footer-text footer-copyright mt-3 mb-0">
+      © <%= footerType === "signatures" ? "2026" : "2025" %> Açougue Corte Fino. Todos os direitos reservados.
+    </p>
+  </div>
+</footer>
+<% } %>

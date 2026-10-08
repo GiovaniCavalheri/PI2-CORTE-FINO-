@@ -11,7 +11,6 @@ class CategoriaController {
     }
   }
 
-  //exclusao via fetch
   async excluir(req, res) {
     let id = req.params.id;
     let categoria = new CategoriasProduto();

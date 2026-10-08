@@ -20,7 +20,6 @@ class ProdutoController {
     });
   }
 
-  //gravacao via fetch
   async cadastrar(req, res) {
     if (
       req.body.nome != "" &&
@@ -45,7 +44,6 @@ class ProdutoController {
     }
   }
 
-  //alteracao via fetch
   async alterar(req, res) {
     if (
       req.body.id != "" &&

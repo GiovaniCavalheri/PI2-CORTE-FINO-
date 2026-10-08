@@ -74,3 +74,6 @@ class Produtos {
     this.#qntEstoque = valor;
   }
 }
+
+
+module.exports = Produtos

@@ -39,3 +39,5 @@ class Promocao {
     this.#dataFim = valor;
   }
 }
+
+module.exports = Promocao

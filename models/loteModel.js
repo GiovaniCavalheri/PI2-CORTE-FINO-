@@ -39,3 +39,6 @@ class Lote {
     this.#qntLote = valor;
   }
 }
+
+
+module.exports = Lote

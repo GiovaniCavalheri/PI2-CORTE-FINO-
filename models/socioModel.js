@@ -165,3 +165,6 @@ class Socio {
     return this.#senha === senhaDigitada;
   }
 }
+
+
+module.exports = Socio

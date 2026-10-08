@@ -165,3 +165,6 @@ class Fornecedor {
     return this.#senha === senhaDigitada;
   }
 }
+
+
+module.exports = Fornecedor; 

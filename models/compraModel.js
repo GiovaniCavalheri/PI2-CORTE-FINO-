@@ -39,3 +39,6 @@ class Compra {
     this.#dataCompra = valor;
   }
 }
+
+
+module.exports = Compra; 

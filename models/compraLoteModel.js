@@ -39,3 +39,5 @@ class CompraLote {
     this.#valorCompra = valor;
   }
 }
+
+module.exports = CompraLote

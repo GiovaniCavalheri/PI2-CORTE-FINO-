@@ -21,3 +21,6 @@ class PromocaoProduto {
     this.#idProduto = valor;
   }
 }
+
+
+module.exports = PromocaoProduto; 

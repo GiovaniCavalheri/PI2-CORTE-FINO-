@@ -21,3 +21,6 @@ class Marca {
     this.#nomeMarca = valor;
   }
 }
+
+
+module.exports = Marca

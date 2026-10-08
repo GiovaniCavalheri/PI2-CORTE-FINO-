@@ -57,3 +57,6 @@ class Descarte {
     this.#motivoDescarte = valor;
   }
 }
+
+
+module.exports = Descarte; 

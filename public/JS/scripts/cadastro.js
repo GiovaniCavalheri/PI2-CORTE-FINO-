@@ -54,9 +54,14 @@ function mRG(input) {
 }
 
 function mTel(input) {
-  let v = input.value.replace(/\D/g, "");
-  v = v.replace(/^(\d{2})(\d)/g, "($1)$2");
-  v = v.replace(/(\d{5})(\d)/, "$1-$2");
+  // fixo: (99)9999-9999 (10 digitos) / celular: (99)99999-9999 (11 digitos)
+  let v = input.value.replace(/\D/g, "").slice(0, 11);
+  if (v.length > 10) {
+    v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1)$2-$3");
+  } else {
+    v = v.replace(/^(\d{2})(\d)/, "($1)$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+  }
   input.value = v;
 }
 
@@ -521,20 +526,20 @@ async function enviarCadastro(tipoForm) {
   try {
     if (tipoForm === "socio") {
       const usuario = {
+        nomeCliente: document.querySelector("#nameSocio").value.trim(),
+        dataNascimento: document.querySelector("#nascimento").value,
         cpfCliente: document.querySelector("#CPF").value.trim(),
+        rgCliente: document.querySelector("#RG").value.trim(),
         emailCliente: document.querySelector("#emailSocio").value.trim(),
-        enderecoCliente: [
-          document.querySelector("#BairroSocio").value.trim(),
-          document.querySelector("#CidadeSocio").value.trim(),
-          document.querySelector("#EstadoSocio").value.trim(),
-          document.querySelector("#CEPSocio").value.trim(),
-          document.querySelector("#numberRedSocio").value.trim(),
-          document.querySelector("#ComplementoSocio").value.trim(),
-        ]
-          .filter(Boolean)
-          .join(", "),
         telefone: document.querySelector("#CelularSocio").value.trim(),
         telComercial: document.querySelector("#TelefoneSocio").value.trim(),
+        cep: document.querySelector("#CEPSocio").value.trim(),
+        cidade: document.querySelector("#CidadeSocio").value.trim(),
+        estado: document.querySelector("#EstadoSocio").value.trim(),
+        bairro: document.querySelector("#BairroSocio").value.trim(),
+        numero: document.querySelector("#numberRedSocio").value.trim(),
+        complemento: document.querySelector("#ComplementoSocio").value.trim(),
+        senhaCliente: document.querySelector("#senhaSocio").value,
       };
 
       const cadastroUsuario = await enviarJson("/usuario/cadastrar", usuario);
@@ -574,12 +579,27 @@ async function enviarCadastro(tipoForm) {
       const resultado = await enviarJson("/fornecedor/cadastrar", {
         cnpjFornecedor: document.querySelector("#CNPJ").value.trim(),
         nomeFornecedor: document.querySelector("#razaosocial").value.trim(),
+        nomeFantasia: document.querySelector("#fantasyname").value.trim(),
+        nomeResponsavel: document
+          .querySelector("#nameFornecedor")
+          .value.trim(),
+        cpfResponsavel: document.querySelector("#CPFFornecedor").value.trim(),
         emailFornecedor: document
           .querySelector("#emailFornecedor")
           .value.trim(),
         telefone: document
           .querySelector("#TelefoneComercialFornecedor")
           .value.trim(),
+        celular: document.querySelector("#CelularFornecedor").value.trim(),
+        cep: document.querySelector("#CEPFornecedor").value.trim(),
+        cidade: document.querySelector("#CidadeFornecedor").value.trim(),
+        estado: document.querySelector("#EstadoFornecedor").value.trim(),
+        bairro: document.querySelector("#BairroFornecedor").value.trim(),
+        numero: document.querySelector("#numberRedFornecedor").value.trim(),
+        formaPagamento: document.querySelector(
+          "#formFornecedor input[name='pagamento']:checked",
+        ).value,
+        senhaFornecedor: document.querySelector("#senhaFornecedor").value,
       });
       if (!resultado.ok) {
         throw new Error("Não foi possível cadastrar o fornecedor.");
@@ -608,7 +628,8 @@ async function enviarJson(url, dados) {
     body: JSON.stringify(dados),
   });
   if (!resposta.ok) {
-    throw new Error(`Falha na requisição (${resposta.status}).`);
+    const corpo = await resposta.json().catch(() => ({}));
+    throw new Error(corpo.erro || `Falha na requisição (${resposta.status}).`);
   }
   return resposta.json();
 }

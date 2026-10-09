@@ -18,6 +18,8 @@ class Database {
       password: "10442521489",
       idleTimeout: 30000,
       connectionLimit: 50,
+      //DATE/DATETIME voltam como texto ("2026-10-08"), sem conversao de fuso
+      dateStrings: true,
     });
   }
 
@@ -41,6 +43,24 @@ class Database {
         else res(results.affectedRows > 0);
       });
     });
+  }
+
+  //executa a funcao dentro de uma transacao: se ela lancar erro, desfaz tudo.
+  //a funcao recebe executar(sql, valores), que devolve o resultado do comando
+  async ExecutaTransacao(funcao) {
+    const cnn = await this.#conexao.promise().getConnection();
+    try {
+      await cnn.beginTransaction();
+      const executar = async (sql, valores) => (await cnn.query(sql, valores))[0];
+      const resultado = await funcao(executar);
+      await cnn.commit();
+      return resultado;
+    } catch (error) {
+      await cnn.rollback();
+      throw error;
+    } finally {
+      cnn.release();
+    }
   }
 
   ExecutaComandoLastInserted(sql, valores) {

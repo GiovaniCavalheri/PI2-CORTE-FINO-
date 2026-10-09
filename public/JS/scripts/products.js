@@ -1,52 +1,53 @@
-// BOTÕES DE FILTRO
+// BOTÕES DE FILTRO E BUSCA
 const botoesFiltro = document.querySelectorAll(".botao-filtro");
 const produtos = document.querySelectorAll(".cartao-produto");
+const campoBusca = document.getElementById("busca");
+
+let filtroAtual = "todos";
+
+// "Suínos" -> "suino" / "Kits Especiais" -> "kit": tira acento e o plural
+// para o botão casar com o nome da categoria vindo do banco
+function raizDoTipo(texto) {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .split(" ")[0]
+    .replace(/s$/, "");
+}
+
+function aplicarFiltros() {
+  const termo = campoBusca ? campoBusca.value.toLowerCase().trim() : "";
+  const raizFiltro = raizDoTipo(filtroAtual);
+
+  produtos.forEach((produto) => {
+    const tipo = produto.dataset.tipo || "";
+    const nome = produto
+      .querySelector(".nome-produto")
+      .textContent.toLowerCase();
+
+    const passaCategoria =
+      filtroAtual === "todos" || raizDoTipo(tipo) === raizFiltro;
+    const passaBusca = nome.includes(termo);
+
+    produto.style.display = passaCategoria && passaBusca ? "block" : "none";
+  });
+}
 
 botoesFiltro.forEach((btn) => {
   btn.addEventListener("click", () => {
     botoesFiltro.forEach((b) => b.classList.remove("ativo"));
     btn.classList.add("ativo");
 
-    const categoria = btn.dataset.categoria;
-
-    produtos.forEach((produto) => {
-      const tipo = produto.dataset.tipo;
-
-      if (categoria === "todos" || tipo === categoria) {
-        produto.style.display = "block";
-      } else {
-        produto.style.display = "none";
-      }
-    });
+    filtroAtual = btn.dataset.categoria;
+    aplicarFiltros();
   });
 });
 
 // BUSCA
-const campoBusca = document.getElementById("busca");
+if (campoBusca) {
+  campoBusca.addEventListener("input", aplicarFiltros);
+}
 
-campoBusca.addEventListener("input", () => {
-  const termo = campoBusca.value.toLowerCase();
-
-  produtos.forEach((produto) => {
-    const nome = produto
-      .querySelector(".nome-produto")
-      .textContent.toLowerCase();
-
-    produto.style.display = nome.includes(termo) ? "block" : "none";
-  });
-});
-
-// BOTÃO "ADICIONAR AO PEDIDO"
-const botoesAdicionar = document.querySelectorAll(".btn-adicionar");
-
-botoesAdicionar.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    btn.textContent = "✓ Adicionado!";
-    btn.style.backgroundColor = "#2ecc71";
-
-    setTimeout(() => {
-      btn.textContent = "Adicionar ao Pedido";
-      btn.style.backgroundColor = "#853439";
-    }, 1600);
-  });
-});
+// o botão "Adicionar ao Pedido" é tratado em cart.js

@@ -384,6 +384,86 @@
         opacity: 1;
         transform: translateY(0);
       }
+
+      /* ── POPUP DE PEDIDO FINALIZADO ── */
+      .popup-fundo {
+        position: fixed;
+        inset: 0;
+        background: rgba(46, 26, 22, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        z-index: 1000;
+      }
+
+      .popup-fundo[hidden] {
+        display: none;
+      }
+
+      .popup-caixa {
+        background: var(--cor-background);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+        animation: fadeSlideIn 0.3s ease both;
+      }
+
+      .popup-icone {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 1rem;
+        border-radius: 50%;
+        background: #4a9e6f;
+        color: #fff;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .popup-icone.erro {
+        background: var(--cor-vermelho);
+      }
+
+      .popup-caixa h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .popup-caixa p {
+        font-size: 0.9rem;
+        color: var(--cor-texto-medio);
+        margin-bottom: 1.25rem;
+        line-height: 1.5;
+      }
+
+      .popup-acao {
+        display: block;
+        text-decoration: none;
+        text-align: center;
+      }
+
+      .popup-acao[hidden] {
+        display: none;
+      }
+
+      .popup-acao + .btn-finalizar {
+        margin-top: 0.6rem;
+        background: none;
+        border: 1.5px solid var(--cor-bege-borda);
+        color: var(--cor-texto-medio);
+      }
+
+      .titulo-secao .qtd-titulo {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--cor-texto-medio);
+      }
     </style>
   </head>
   <body>
@@ -395,7 +475,8 @@
       <!-- COLUNA ESQUERDA: lista de itens -->
       <section>
         <h2 class="titulo-secao">
-          <span class="icone"></span> Meus Pedido
+          <span class="icone"></span> Meu Pedido
+          <span class="qtd-titulo" id="qtd-titulo">(0 itens)</span>
         </h2>
         <div class="lista-itens" id="lista-itens">
           <!-- itens inseridos pelo JS -->
@@ -431,13 +512,30 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
+    <!-- POPUP DE PEDIDO FINALIZADO -->
+    <div class="popup-fundo" id="popup" hidden>
+      <div class="popup-caixa" role="dialog" aria-modal="true" aria-labelledby="popup-titulo">
+        <div class="popup-icone" id="popup-icone">✓</div>
+        <h3 id="popup-titulo">Pedido finalizado!</h3>
+        <p id="popup-texto"></p>
+        <a class="btn-finalizar popup-acao" id="popup-acao" href="/join?voltar=/cart" hidden>Entrar</a>
+        <button class="btn-finalizar" id="popup-fechar">OK</button>
+      </div>
+    </div>
+
     <script>
 
       const CHAVE_CARRINHO = "carrinho_corte_fino";
 
       function lerCarrinho() {
-        const dados = localStorage.getItem(CHAVE_CARRINHO);
-        return dados ? JSON.parse(dados) : [];
+        try {
+          const dados = localStorage.getItem(CHAVE_CARRINHO);
+          const itens = dados ? JSON.parse(dados) : [];
+          // itens salvos antes do carrinho guardar o id do produto nao tem como baixar estoque
+          return itens.filter((item) => Number.isInteger(item.idProduto));
+        } catch (erro) {
+          return [];
+        }
       }
 
       function salvarCarrinho(itens) {
@@ -456,6 +554,12 @@
         const index = itens.findIndex((item) => item.id === id);
 
         if (index === -1) return;
+
+        // nao passa do estoque que existia quando o produto foi adicionado
+        if (delta > 0 && itens[index].quantidade >= itens[index].estoque) {
+          mostrarToast("Quantidade máxima em estoque atingida");
+          return;
+        }
 
         itens[index].quantidade += delta;
 
@@ -483,6 +587,8 @@
 
         document.getElementById("resumo-qtd-label").textContent =
           `Itens (${totalItens})`;
+        document.getElementById("qtd-titulo").textContent =
+          `(${totalItens} ${totalItens === 1 ? "item" : "itens"})`;
         document.getElementById("resumo-subtotal").textContent =
           formatarMoeda(subtotal);
         document.getElementById("resumo-total").textContent =
@@ -558,10 +664,70 @@
         setTimeout(() => toast.classList.remove("visivel"), 2500);
       }
 
-      document.getElementById("btn-finalizar").addEventListener("click", () => {
-        mostrarToast("Pedido enviado! Em breve entraremos em contato.");
-        salvarCarrinho([]);
-        setTimeout(renderizarCarrinho, 2600);
+      function abrirPopup(sucesso, titulo, texto, mostrarEntrar = false) {
+        document.getElementById("popup-acao").hidden = !mostrarEntrar;
+        const icone = document.getElementById("popup-icone");
+        icone.textContent = sucesso ? "✓" : "!";
+        icone.classList.toggle("erro", !sucesso);
+        document.getElementById("popup-titulo").textContent = titulo;
+        document.getElementById("popup-texto").textContent = texto;
+        document.getElementById("popup").hidden = false;
+        document.getElementById("popup-fechar").focus();
+      }
+
+      document.getElementById("popup-fechar").addEventListener("click", () => {
+        document.getElementById("popup").hidden = true;
+      });
+
+      // envia os itens ao servidor, que baixa o estoque no banco (tudo ou nada)
+      document.getElementById("btn-finalizar").addEventListener("click", async () => {
+        const itens = lerCarrinho();
+        if (itens.length === 0) return;
+
+        const botao = document.getElementById("btn-finalizar");
+        botao.disabled = true;
+        botao.textContent = "Enviando...";
+
+        try {
+          const resposta = await fetch("/pedido/finalizar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              itens: itens.map((item) => ({
+                idProduto: item.idProduto,
+                quantidade: item.quantidade,
+              })),
+            }),
+          });
+          const resultado = await resposta.json();
+
+          if (resposta.ok && resultado.ok) {
+            salvarCarrinho([]);
+            renderizarCarrinho();
+            abrirPopup(
+              true,
+              "Pedido finalizado!",
+              `Pedido nº ${resultado.idPedido} · ${resultado.totalItens} ${resultado.totalItens === 1 ? "item" : "itens"} · Total ${formatarMoeda(resultado.valor)}. Em breve entraremos em contato.`
+            );
+          } else if (resultado.precisaLogin) {
+            // o carrinho continua salvo; depois do login a pessoa volta para ca
+            abrirPopup(false, "Faça login para finalizar", resultado.erro, true);
+          } else {
+            const item = itens.find((i) => i.idProduto === resultado.idProduto);
+            abrirPopup(
+              false,
+              "Não foi possível finalizar",
+              item
+                ? `Estoque insuficiente para "${item.nome}". Diminua a quantidade e tente novamente.`
+                : resultado.erro || "Tente novamente."
+            );
+          }
+        } catch (erro) {
+          abrirPopup(false, "Não foi possível finalizar", "Erro de conexão. Tente novamente.");
+        } finally {
+          botao.textContent = "Finalizar Pedido";
+          atualizarResumo(lerCarrinho());
+        }
       });
 
       // ─────────────────────────────────────────────

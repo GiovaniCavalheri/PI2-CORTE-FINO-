@@ -3,6 +3,10 @@
   <a href="/" class="header-logo">Corte Fino</a>
   <a href="/" class="btn-voltar">← Continuar comprando</a>
 </header>
+<script>
+  // a pagina do carrinho atualiza o proprio resumo; aqui so evita erro de chamada
+  window.atualizarContadorCarrinho = function () {};
+</script>
 <% } else { %>
 <div class="header-top py-2">
   <div class="container d-flex justify-content-end gap-3">
@@ -53,13 +57,41 @@
           <a href="/signatures" class="nav-link <%= currentPage === 'signatures' ? 'active' : '' %>">Assinaturas</a>
         </li>
         <li class="nav-item">
-          <a href="/cart" class="nav-link <%= currentPage === 'cart' ? 'active' : '' %>">Carrinho</a>
+          <a href="/cart" class="nav-link <%= currentPage === 'cart' ? 'active' : '' %>">
+            Carrinho <span class="contador-carrinho" id="contadorCarrinho" hidden>0</span>
+          </a>
         </li>
+        <% if (locals.usuarioLogado) { %>
+        <li class="nav-item d-flex align-items-center">
+          <span class="nav-link destaque-vermelho usuario-logado" title="<%= usuarioLogado.nome %>">
+            <i class="fa-solid fa-user"></i> <%= usuarioLogado.nome.split(" ")[0] %>
+          </span>
+          <a href="/logout" class="nav-link link-sair">Sair</a>
+        </li>
+        <% } else { %>
         <li class="nav-item">
           <a href="/join" class="nav-link destaque-vermelho <%= currentPage === 'join' || currentPage === 'cadastro' || currentPage === 'adm' ? 'active' : '' %>">Entrar</a>
         </li>
+        <% } %>
       </ul>
     </div>
   </div>
 </nav>
+<script>
+  // mostra no header quantos itens (soma das quantidades) estao no carrinho
+  window.atualizarContadorCarrinho = function () {
+    var contador = document.getElementById("contadorCarrinho");
+    if (!contador) return;
+    var total = 0;
+    try {
+      var itens = JSON.parse(localStorage.getItem("carrinho_corte_fino")) || [];
+      total = itens.reduce(function (soma, item) {
+        return soma + (item.quantidade || 0);
+      }, 0);
+    } catch (e) {}
+    contador.textContent = total;
+    contador.hidden = total === 0;
+  };
+  window.atualizarContadorCarrinho();
+</script>
 <% } %>

@@ -89,7 +89,7 @@
 .hero-section-index {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)),
-    url("/src/public/index-images/testeBack.png");
+    url("/images/index-images/testeBack.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -552,7 +552,7 @@
 .hero-section {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)),
-    url("/src/public/index-images/image-product-background.png");
+    url("/images/index-images/image-product-background.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -931,7 +931,7 @@
 .hero-section1 {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)),
-    url("/src/public/index-images/about-background.png");
+    url("/images/index-images/about-background.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -996,7 +996,7 @@
 .hero-section3 {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)),
-    url("/src/public/index-images/background-services.png");
+    url("/images/index-images/background-services.png");
   background-size: cover;
   background-position: center;
   color: white;

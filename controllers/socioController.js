@@ -23,12 +23,26 @@ class SocioController {
   }
 
   async listar(req, res) {
-    const socios = await new Socio().listar();
+    //traz os dados do cliente junto, para o gerenciamento no pageAdm
+    const socios = await new Socio().listarDetalhado();
     return res.send(
       socios.map((socio) => ({
-        id: socio.id,
-        dataAdesao: socio.dataAdesao,
-        dataVencimento: socio.dataVencimento,
+        id: socio.ID_CLIENTE,
+        nomeCliente: socio.NOME_CLIENTE,
+        dataNascimento: socio.DATA_NASCIMENTO,
+        cpfCliente: socio.CPF_CLIENTE,
+        rgCliente: socio.RG_CLIENTE,
+        emailCliente: socio.EMAIL_CLIENTE,
+        telefone: socio.TELEFONE,
+        telComercial: socio.TEL_COMERCIAL,
+        cep: socio.CEP,
+        cidade: socio.CIDADE,
+        estado: socio.ESTADO,
+        bairro: socio.BAIRRO,
+        numero: socio.NUMERO,
+        complemento: socio.COMPLEMENTO,
+        dataAdesao: socio.DATA_ADESAO,
+        dataVencimento: socio.DATA_VENCIMENTO,
       })),
     );
   }

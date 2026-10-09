@@ -51,6 +51,16 @@
         <a class="nav-link-cf" data-section="cadastros">
           <i class="fa-solid fa-tags"></i> Categorias e Marcas
         </a>
+
+        <div class="nav-label">Pessoas</div>
+        <a class="nav-link-cf" data-section="socios">
+          <i class="fa-solid fa-users"></i> Sócios
+        </a>
+        <a class="nav-link-cf" data-section="fornecedores">
+          <i class="fa-solid fa-truck"></i> Fornecedores
+        </a>
+
+        <div class="nav-label">Outros</div>
         <a class="nav-link-cf" data-section="relatorios">
           <i class="fa-solid fa-chart-pie"></i> Relatorios
         </a>
@@ -110,10 +120,17 @@
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
             <div>
-              <div class="stat-value">4</div>
-              <div class="stat-label">Relatórios</div>
+              <div class="stat-value" id="totalSocios">0</div>
+              <div class="stat-label">Sócios cadastrados</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-truck"></i></div>
+            <div>
+              <div class="stat-value" id="totalFornecedores">0</div>
+              <div class="stat-label">Fornecedores cadastrados</div>
             </div>
           </div>
         </div>
@@ -131,6 +148,12 @@
             </button>
             <button class="quick-btn" onclick="navigateTo('produtos')">
               <i class="fa-solid fa-trash-can"></i> Gerenciar / excluir produtos
+            </button>
+            <button class="quick-btn" onclick="navigateTo('socios')">
+              <i class="fa-solid fa-users"></i> Gerenciar sócios
+            </button>
+            <button class="quick-btn" onclick="navigateTo('fornecedores')">
+              <i class="fa-solid fa-truck"></i> Gerenciar fornecedores
             </button>
           </div>
           <div class="form-card">
@@ -442,6 +465,258 @@
               </tr>
               <% } %>
             </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════ SÓCIOS ═══════ -->
+      <div class="page-content" id="section-socios">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-user-plus"></i>
+            <span id="tituloFormSocio">Cadastrar Sócio</span>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <!-- guarda o id (ID_CLIENTE = ID_SOCIO) quando estamos editando -->
+          <input type="hidden" id="idSocio" value="" />
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Nome completo *</label>
+              <input type="text" id="socioNome" placeholder="Ex: João da Silva" />
+            </div>
+            <div>
+              <label class="form-label">Data de nascimento *</label>
+              <input type="date" id="socioNascimento" />
+            </div>
+            <div>
+              <label class="form-label">E-mail *</label>
+              <input type="email" id="socioEmail" placeholder="email@exemplo.com" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">CPF *</label>
+              <input type="text" id="socioCpf" maxlength="14" placeholder="000.000.000-00" />
+            </div>
+            <div>
+              <label class="form-label">RG *</label>
+              <input type="text" id="socioRg" maxlength="12" placeholder="00.000.000-0" />
+            </div>
+            <div>
+              <label class="form-label">Celular *</label>
+              <input type="text" id="socioCelular" maxlength="14" placeholder="(99)99999-9999" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Telefone *</label>
+              <input type="text" id="socioTelefone" maxlength="14" placeholder="(99)9999-9999" />
+            </div>
+            <div>
+              <label class="form-label">CEP *</label>
+              <input type="text" id="socioCep" maxlength="9" placeholder="00000-000" />
+            </div>
+            <div>
+              <label class="form-label">Cidade *</label>
+              <input type="text" id="socioCidade" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Estado (UF) *</label>
+              <input type="text" id="socioEstado" maxlength="2" placeholder="SP" />
+            </div>
+            <div>
+              <label class="form-label">Bairro *</label>
+              <input type="text" id="socioBairro" />
+            </div>
+            <div>
+              <label class="form-label">Número *</label>
+              <input type="text" id="socioNumero" maxlength="10" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Complemento</label>
+              <input type="text" id="socioComplemento" maxlength="100" />
+            </div>
+            <div>
+              <label class="form-label">Data de adesão *</label>
+              <input type="date" id="socioAdesao" />
+            </div>
+            <div>
+              <label class="form-label">Data de vencimento *</label>
+              <input type="date" id="socioVencimento" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3 form-row-spaced" id="grupoSenhaSocio">
+            <div>
+              <label class="form-label">Senha * (só no cadastro)</label>
+              <input type="text" id="socioSenha" placeholder="Senha de acesso" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-red" id="btnGravarSocio">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Sócio
+            </button>
+            <button class="btn-outline" id="btnLimparSocio">Limpar</button>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-list-ul"></i> Sócios Cadastrados
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>E-mail</th>
+                <th>Celular</th>
+                <th>Cidade/UF</th>
+                <th>Vencimento</th>
+                <th class="table-actions-wide">Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="listaSocios"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════ FORNECEDORES ═══════ -->
+      <div class="page-content" id="section-fornecedores">
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-truck"></i>
+            <span id="tituloFormFornecedor">Cadastrar Fornecedor</span>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <input type="hidden" id="idFornecedor" value="" />
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Razão Social *</label>
+              <input type="text" id="fornRazao" />
+            </div>
+            <div>
+              <label class="form-label">Nome Fantasia *</label>
+              <input type="text" id="fornFantasia" />
+            </div>
+            <div>
+              <label class="form-label">CNPJ *</label>
+              <input type="text" id="fornCnpj" maxlength="18" placeholder="00.000.000/0000-00" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Nome do responsável *</label>
+              <input type="text" id="fornResponsavel" />
+            </div>
+            <div>
+              <label class="form-label">CPF do responsável *</label>
+              <input type="text" id="fornCpfResponsavel" maxlength="14" placeholder="000.000.000-00" />
+            </div>
+            <div>
+              <label class="form-label">E-mail *</label>
+              <input type="email" id="fornEmail" placeholder="email@exemplo.com" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Telefone comercial *</label>
+              <input type="text" id="fornTelefone" maxlength="14" placeholder="(99)9999-9999" />
+            </div>
+            <div>
+              <label class="form-label">Celular *</label>
+              <input type="text" id="fornCelular" maxlength="14" placeholder="(99)99999-9999" />
+            </div>
+            <div>
+              <label class="form-label">CEP *</label>
+              <input type="text" id="fornCep" maxlength="9" placeholder="00000-000" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Cidade *</label>
+              <input type="text" id="fornCidade" />
+            </div>
+            <div>
+              <label class="form-label">Estado (UF) *</label>
+              <input type="text" id="fornEstado" maxlength="2" placeholder="SP" />
+            </div>
+            <div>
+              <label class="form-label">Bairro *</label>
+              <input type="text" id="fornBairro" />
+            </div>
+          </div>
+
+          <div class="form-row cols-3 form-row-spaced">
+            <div>
+              <label class="form-label">Número *</label>
+              <input type="text" id="fornNumero" maxlength="10" />
+            </div>
+            <div>
+              <label class="form-label">Forma de pagamento *</label>
+              <select id="fornPagamento">
+                <option value="">Selecione...</option>
+                <option value="debcred">Cartão Débito/Crédito</option>
+                <option value="ted">Transferência TED</option>
+                <option value="pix">PIX</option>
+                <option value="cheque">Cheque</option>
+              </select>
+            </div>
+            <div id="grupoSenhaFornecedor">
+              <label class="form-label">Senha * (só no cadastro)</label>
+              <input type="text" id="fornSenha" placeholder="Senha de acesso" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-red" id="btnGravarFornecedor">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Fornecedor
+            </button>
+            <button class="btn-outline" id="btnLimparFornecedor">Limpar</button>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-list-ul"></i> Fornecedores Cadastrados
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Razão Social</th>
+                <th>Nome Fantasia</th>
+                <th>CNPJ</th>
+                <th>Responsável</th>
+                <th>Telefone</th>
+                <th>Pagamento</th>
+                <th class="table-actions-wide">Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="listaFornecedores"></tbody>
           </table>
         </div>
       </div>

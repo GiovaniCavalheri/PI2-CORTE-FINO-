@@ -23,6 +23,8 @@
           dashboard: "Painel",
           produtos: "Produtos",
           cadastros: "Categorias e Marcas",
+          socios: "Sócios",
+          fornecedores: "Fornecedores",
           relatorios: "Relatorios",
         };
 
@@ -46,13 +48,68 @@
         var listaProdutos = document.querySelector("#listaProdutos");
         var listaCategorias = document.querySelector("#listaCategorias");
         var listaMarcas = document.querySelector("#listaMarcas");
+        var listaSocios = document.querySelector("#listaSocios");
+        var listaFornecedores = document.querySelector("#listaFornecedores");
 
         async function requisicaoJson(url, configuracao) {
           var resposta = await fetch(url, configuracao);
           if (!resposta.ok) {
-            throw new Error("Falha na requisição (" + resposta.status + ").");
+            // o servidor devolve { erro } (ex.: registro em uso ou duplicado)
+            var corpo = await resposta.json().catch(function () {
+              return {};
+            });
+            throw new Error(
+              corpo.erro || "Falha na requisição (" + resposta.status + ").",
+            );
           }
           return resposta.json();
+        }
+
+        function enviarJson(url, dados) {
+          return requisicaoJson(url, {
+            method: "POST",
+            body: JSON.stringify(dados),
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        function linhaVazia(lista, colunas, texto) {
+          var linha = document.createElement("tr");
+          var celula = document.createElement("td");
+          celula.colSpan = colunas;
+          celula.textContent = texto;
+          linha.appendChild(celula);
+          lista.appendChild(linha);
+        }
+
+        function formatarCpf(cpf) {
+          cpf = cpf || "";
+          return cpf.length === 11
+            ? cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+            : cpf;
+        }
+
+        function formatarCnpj(cnpj) {
+          cnpj = cnpj || "";
+          return cnpj.length === 14
+            ? cnpj.replace(
+                /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+                "$1.$2.$3/$4-$5",
+              )
+            : cnpj;
+        }
+
+        function formatarData(data) {
+          // "2026-10-08" -> "08/10/2026"
+          return data ? data.split("-").reverse().join("/") : "";
+        }
+
+        function hojeMais(dias) {
+          var data = new Date();
+          data.setDate(data.getDate() + dias);
+          var mes = String(data.getMonth() + 1).padStart(2, "0");
+          var dia = String(data.getDate()).padStart(2, "0");
+          return data.getFullYear() + "-" + mes + "-" + dia;
         }
 
         function criarCelula(valor) {
@@ -214,10 +271,14 @@
               requisicaoJson("/produto/listar"),
               requisicaoJson("/categoria/listar"),
               requisicaoJson("/marca/listar"),
+              requisicaoJson("/socio/listar"),
+              requisicaoJson("/fornecedor/listar"),
             ]);
             renderizarProdutos(dados[0]);
             renderizarCategorias(dados[1]);
             renderizarMarcas(dados[2]);
+            renderizarSocios(dados[3]);
+            renderizarFornecedores(dados[4]);
           } catch (erro) {
             alert("Não foi possível carregar os cadastros: " + erro.message);
           }
@@ -559,5 +620,363 @@
           var botaoExcluir = evento.target.closest(".btnExcluirMarca");
           if (botaoEditar) editarMarca(botaoEditar);
           if (botaoExcluir) excluirMarca.call(botaoExcluir);
+        });
+
+        // ──────────────────────────────────────────────
+        // SOCIOS (dados em CLIENTE + datas em SOCIO)
+        // ──────────────────────────────────────────────
+        var sociosPorId = {};
+
+        var camposSocio = {
+          nomeCliente: "#socioNome",
+          dataNascimento: "#socioNascimento",
+          cpfCliente: "#socioCpf",
+          rgCliente: "#socioRg",
+          emailCliente: "#socioEmail",
+          telefone: "#socioCelular",
+          telComercial: "#socioTelefone",
+          cep: "#socioCep",
+          cidade: "#socioCidade",
+          estado: "#socioEstado",
+          bairro: "#socioBairro",
+          numero: "#socioNumero",
+          complemento: "#socioComplemento",
+          dataAdesao: "#socioAdesao",
+          dataVencimento: "#socioVencimento",
+        };
+
+        function renderizarSocios(socios) {
+          sociosPorId = {};
+          listaSocios.replaceChildren();
+          if (socios.length === 0) {
+            linhaVazia(listaSocios, 7, "Nenhum sócio cadastrado ainda.");
+          }
+          socios.forEach(function (socio) {
+            sociosPorId[socio.id] = socio;
+            var linha = document.createElement("tr");
+            linha.append(
+              criarCelula(socio.nomeCliente),
+              criarCelula(formatarCpf(socio.cpfCliente)),
+              criarCelula(socio.emailCliente),
+              criarCelula(socio.telefone),
+              criarCelula(
+                socio.cidade ? socio.cidade + "/" + socio.estado : "",
+              ),
+              criarCelula(formatarData(socio.dataVencimento)),
+            );
+            var acoes = document.createElement("td");
+            acoes.append(
+              criarBotaoAcao(
+                "btn-outline btnEditarSocio",
+                socio.id,
+                "fa-solid fa-pen",
+              ),
+              criarBotaoAcao(
+                "btn-danger btnExcluirSocio",
+                socio.id,
+                "fa-solid fa-trash",
+              ),
+            );
+            linha.appendChild(acoes);
+            listaSocios.appendChild(linha);
+          });
+          document.querySelector("#totalSocios").textContent = socios.length;
+        }
+
+        function limparFormularioSocio() {
+          document.querySelector("#idSocio").value = "";
+          Object.values(camposSocio).forEach(function (seletor) {
+            document.querySelector(seletor).value = "";
+          });
+          document.querySelector("#socioSenha").value = "";
+          document.querySelector("#socioAdesao").value = hojeMais(0);
+          document.querySelector("#socioVencimento").value = hojeMais(30);
+          document.querySelector("#grupoSenhaSocio").style.display = "";
+          document.querySelector("#tituloFormSocio").textContent =
+            "Cadastrar Sócio";
+        }
+
+        function editarSocio(botao) {
+          var socio = sociosPorId[botao.dataset.id];
+          if (!socio) return;
+          document.querySelector("#idSocio").value = socio.id;
+          Object.keys(camposSocio).forEach(function (campo) {
+            var valor = socio[campo];
+            if (campo === "cpfCliente") valor = formatarCpf(valor);
+            document.querySelector(camposSocio[campo]).value =
+              valor == null ? "" : valor;
+          });
+          // a senha nao e alterada por aqui
+          document.querySelector("#grupoSenhaSocio").style.display = "none";
+          document.querySelector("#tituloFormSocio").textContent =
+            "Alterar Sócio";
+          document
+            .querySelector("#socioNome")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+
+        async function gravarSocio() {
+          var id = document.querySelector("#idSocio").value;
+          var dados = {};
+          Object.keys(camposSocio).forEach(function (campo) {
+            dados[campo] = document.querySelector(camposSocio[campo]).value.trim();
+          });
+          var senha = document.querySelector("#socioSenha").value;
+
+          var obrigatorios = Object.keys(camposSocio).filter(function (campo) {
+            return campo !== "complemento";
+          });
+          var faltando = obrigatorios.some(function (campo) {
+            return dados[campo] === "";
+          });
+          if (faltando || (!id && senha === "")) {
+            alert("Preencha corretamente todos os campos obrigatorios!");
+            return;
+          }
+
+          try {
+            if (id) {
+              dados.id = id;
+              var alterouCliente = await enviarJson("/usuario/alterar", dados);
+              var alterouSocio = await enviarJson("/socio/alterar", {
+                id: id,
+                dataAdesao: dados.dataAdesao,
+                dataVencimento: dados.dataVencimento,
+              });
+              if (!alterouCliente.ok || !alterouSocio.ok) {
+                throw new Error("Confira CPF, CEP, UF e as datas informadas.");
+              }
+            } else {
+              dados.senhaCliente = senha;
+              var cliente = await enviarJson("/usuario/cadastrar", dados);
+              if (!cliente.ok) {
+                throw new Error("Confira CPF, CEP, UF e as datas informadas.");
+              }
+              var socio = await enviarJson("/socio/cadastrar", {
+                id: cliente.id,
+                dataAdesao: dados.dataAdesao,
+                dataVencimento: dados.dataVencimento,
+              }).catch(function () {
+                return { ok: false };
+              });
+              if (!socio.ok) {
+                // desfaz o cliente criado para nao ficar pela metade
+                await requisicaoJson("/usuario/excluir/" + cliente.id, {
+                  method: "DELETE",
+                }).catch(function () {});
+                throw new Error("Não foi possível gravar as datas do sócio.");
+              }
+            }
+            alert("Sócio gravado com sucesso!");
+            limparFormularioSocio();
+            await carregarListas();
+          } catch (erro) {
+            alert("Erro ao gravar o sócio: " + erro.message);
+          }
+        }
+
+        async function excluirSocio(botao) {
+          var id = botao.dataset.id;
+          if (!confirm("Deseja realmente excluir este sócio?")) return;
+
+          try {
+            // o servidor apaga SOCIO e CLIENTE juntos (bloqueia se houver pedidos)
+            var socio = await requisicaoJson(
+              "/socio/excluir/" + encodeURIComponent(id),
+              { method: "DELETE" },
+            );
+            if (!socio.ok) {
+              throw new Error("O servidor não excluiu o sócio.");
+            }
+            await carregarListas();
+          } catch (erro) {
+            alert("Erro ao excluir o sócio: " + erro.message);
+          }
+        }
+
+        document
+          .querySelector("#btnGravarSocio")
+          .addEventListener("click", gravarSocio);
+        document
+          .querySelector("#btnLimparSocio")
+          .addEventListener("click", limparFormularioSocio);
+        listaSocios.addEventListener("click", function (evento) {
+          var botaoEditar = evento.target.closest(".btnEditarSocio");
+          var botaoExcluir = evento.target.closest(".btnExcluirSocio");
+          if (botaoEditar) editarSocio(botaoEditar);
+          if (botaoExcluir) excluirSocio(botaoExcluir);
+        });
+        limparFormularioSocio();
+
+        // ──────────────────────────────────────────────
+        // FORNECEDORES
+        // ──────────────────────────────────────────────
+        var fornecedoresPorId = {};
+
+        var camposFornecedor = {
+          nomeFornecedor: "#fornRazao",
+          nomeFantasia: "#fornFantasia",
+          cnpjFornecedor: "#fornCnpj",
+          nomeResponsavel: "#fornResponsavel",
+          cpfResponsavel: "#fornCpfResponsavel",
+          emailFornecedor: "#fornEmail",
+          telefone: "#fornTelefone",
+          celular: "#fornCelular",
+          cep: "#fornCep",
+          cidade: "#fornCidade",
+          estado: "#fornEstado",
+          bairro: "#fornBairro",
+          numero: "#fornNumero",
+          formaPagamento: "#fornPagamento",
+        };
+
+        var nomesPagamento = {
+          debcred: "Cartão",
+          ted: "TED",
+          pix: "PIX",
+          cheque: "Cheque",
+        };
+
+        function renderizarFornecedores(fornecedores) {
+          fornecedoresPorId = {};
+          listaFornecedores.replaceChildren();
+          if (fornecedores.length === 0) {
+            linhaVazia(
+              listaFornecedores,
+              7,
+              "Nenhum fornecedor cadastrado ainda.",
+            );
+          }
+          fornecedores.forEach(function (fornecedor) {
+            fornecedoresPorId[fornecedor.id] = fornecedor;
+            var linha = document.createElement("tr");
+            linha.append(
+              criarCelula(fornecedor.nomeFornecedor),
+              criarCelula(fornecedor.nomeFantasia),
+              criarCelula(formatarCnpj(fornecedor.cnpjFornecedor)),
+              criarCelula(fornecedor.nomeResponsavel),
+              criarCelula(fornecedor.telefone),
+              criarCelula(
+                nomesPagamento[fornecedor.formaPagamento] ||
+                  fornecedor.formaPagamento,
+              ),
+            );
+            var acoes = document.createElement("td");
+            acoes.append(
+              criarBotaoAcao(
+                "btn-outline btnEditarFornecedor",
+                fornecedor.id,
+                "fa-solid fa-pen",
+              ),
+              criarBotaoAcao(
+                "btn-danger btnExcluirFornecedor",
+                fornecedor.id,
+                "fa-solid fa-trash",
+              ),
+            );
+            linha.appendChild(acoes);
+            listaFornecedores.appendChild(linha);
+          });
+          document.querySelector("#totalFornecedores").textContent =
+            fornecedores.length;
+        }
+
+        function limparFormularioFornecedor() {
+          document.querySelector("#idFornecedor").value = "";
+          Object.values(camposFornecedor).forEach(function (seletor) {
+            document.querySelector(seletor).value = "";
+          });
+          document.querySelector("#fornSenha").value = "";
+          document.querySelector("#grupoSenhaFornecedor").style.display = "";
+          document.querySelector("#tituloFormFornecedor").textContent =
+            "Cadastrar Fornecedor";
+        }
+
+        function editarFornecedor(botao) {
+          var fornecedor = fornecedoresPorId[botao.dataset.id];
+          if (!fornecedor) return;
+          document.querySelector("#idFornecedor").value = fornecedor.id;
+          Object.keys(camposFornecedor).forEach(function (campo) {
+            var valor = fornecedor[campo];
+            if (campo === "cnpjFornecedor") valor = formatarCnpj(valor);
+            if (campo === "cpfResponsavel") valor = formatarCpf(valor);
+            document.querySelector(camposFornecedor[campo]).value =
+              valor == null ? "" : valor;
+          });
+          document.querySelector("#grupoSenhaFornecedor").style.display =
+            "none";
+          document.querySelector("#tituloFormFornecedor").textContent =
+            "Alterar Fornecedor";
+          document
+            .querySelector("#fornRazao")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+
+        async function gravarFornecedor() {
+          var id = document.querySelector("#idFornecedor").value;
+          var dados = {};
+          Object.keys(camposFornecedor).forEach(function (campo) {
+            dados[campo] = document
+              .querySelector(camposFornecedor[campo])
+              .value.trim();
+          });
+          var senha = document.querySelector("#fornSenha").value;
+
+          var faltando = Object.keys(dados).some(function (campo) {
+            return dados[campo] === "";
+          });
+          if (faltando || (!id && senha === "")) {
+            alert("Preencha corretamente todos os campos obrigatorios!");
+            return;
+          }
+
+          try {
+            var resultado;
+            if (id) {
+              dados.id = id;
+              resultado = await enviarJson("/fornecedor/alterar", dados);
+            } else {
+              dados.senhaFornecedor = senha;
+              resultado = await enviarJson("/fornecedor/cadastrar", dados);
+            }
+            if (!resultado.ok) {
+              throw new Error("Confira CNPJ, CPF, CEP e UF informados.");
+            }
+            alert("Fornecedor gravado com sucesso!");
+            limparFormularioFornecedor();
+            await carregarListas();
+          } catch (erro) {
+            alert("Erro ao gravar o fornecedor: " + erro.message);
+          }
+        }
+
+        async function excluirFornecedor(botao) {
+          if (!confirm("Deseja realmente excluir este fornecedor?")) return;
+
+          try {
+            var resultado = await requisicaoJson(
+              "/fornecedor/excluir/" + encodeURIComponent(botao.dataset.id),
+              { method: "DELETE" },
+            );
+            if (!resultado.ok) {
+              throw new Error("O servidor não excluiu o fornecedor.");
+            }
+            await carregarListas();
+          } catch (erro) {
+            alert("Erro ao excluir o fornecedor: " + erro.message);
+          }
+        }
+
+        document
+          .querySelector("#btnGravarFornecedor")
+          .addEventListener("click", gravarFornecedor);
+        document
+          .querySelector("#btnLimparFornecedor")
+          .addEventListener("click", limparFormularioFornecedor);
+        listaFornecedores.addEventListener("click", function (evento) {
+          var botaoEditar = evento.target.closest(".btnEditarFornecedor");
+          var botaoExcluir = evento.target.closest(".btnExcluirFornecedor");
+          if (botaoEditar) editarFornecedor(botaoEditar);
+          if (botaoExcluir) excluirFornecedor(botaoExcluir);
         });
       });

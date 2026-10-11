@@ -2,31 +2,31 @@ const Socio = require("../models/socioModel");
 
 class SocioController {
   async cadastrar(req, res) {
-    const { id, dataAdesao, dataVencimento } = req.body;
-    const idSocio = Number(id);
+    let id = req.body.id;
+    let dataAdesao = req.body.dataAdesao;
+    let dataVencimento = req.body.dataVencimento;
 
     if (
-      !Number.isSafeInteger(idSocio) ||
-      idSocio <= 0 ||
-      typeof dataAdesao !== "string" ||
-      !dataAdesao.trim() ||
-      typeof dataVencimento !== "string" ||
-      !dataVencimento.trim()
+      id && id > 0 &&
+      typeof dataAdesao == "string" && dataAdesao.trim() != "" &&
+      typeof dataVencimento == "string" && dataVencimento.trim() != ""
     ) {
-      return res.send({ ok: false });
+      let socio = new Socio(id, dataAdesao, dataVencimento);
+      let okRetornoBanco = await socio.cadastrar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-
-    const socio = new Socio(idSocio, dataAdesao, dataVencimento);
-    const okRetornoBanco = await socio.cadastrar();
-
-    return res.send({ ok: okRetornoBanco });
   }
 
   async listar(req, res) {
     //traz os dados do cliente junto, para o gerenciamento no pageAdm
-    const socios = await new Socio().listarDetalhado();
-    return res.send(
-      socios.map((socio) => ({
+    let socios = await new Socio().listarDetalhado();
+
+    let lista = [];
+    for (let i = 0; i < socios.length; i++) {
+      let socio = socios[i];
+      lista.push({
         id: socio.ID_CLIENTE,
         nomeCliente: socio.NOME_CLIENTE,
         dataNascimento: socio.DATA_NASCIMENTO,
@@ -43,28 +43,27 @@ class SocioController {
         complemento: socio.COMPLEMENTO,
         dataAdesao: socio.DATA_ADESAO,
         dataVencimento: socio.DATA_VENCIMENTO,
-      })),
-    );
+      });
+    }
+    res.send(lista);
   }
 
   async alterar(req, res) {
-    const { id, dataAdesao, dataVencimento } = req.body;
-    const idSocio = Number(id);
+    let id = req.body.id;
+    let dataAdesao = req.body.dataAdesao;
+    let dataVencimento = req.body.dataVencimento;
 
     if (
-      !Number.isSafeInteger(idSocio) ||
-      idSocio <= 0 ||
-      typeof dataAdesao !== "string" ||
-      !dataAdesao.trim() ||
-      typeof dataVencimento !== "string" ||
-      !dataVencimento.trim()
+      id && id > 0 &&
+      typeof dataAdesao == "string" && dataAdesao.trim() != "" &&
+      typeof dataVencimento == "string" && dataVencimento.trim() != ""
     ) {
-      return res.send({ ok: false });
+      let socio = new Socio(id, dataAdesao, dataVencimento);
+      let okRetornoBanco = await socio.alterar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-
-    const socio = new Socio(idSocio, dataAdesao, dataVencimento);
-    const okRetornoBanco = await socio.alterar();
-    return res.send({ ok: okRetornoBanco });
   }
 }
 

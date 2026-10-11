@@ -2,44 +2,57 @@ const Produtos = require("../models/produtosModel");
 const CategoriasProduto = require("../models/categoriaProdutoModel");
 const Marca = require("../models/marcaModel");
 
-function lerDadosProduto(body) {
-  const categoria = Number(body.categoria);
-  const marca = Number(body.marca);
-  const preco = Number(body.preco);
-  const estoque = Number(body.estoque);
+//confere os campos do formulario e monta o produto.
+//devolve null se algum campo estiver errado
+function montarProduto(id, body) {
+  let categoria = Number(body.categoria);
+  let marca = Number(body.marca);
+  let preco = Number(body.preco);
+  let estoque = Number(body.estoque);
 
-  if (
-    typeof body.nome !== "string" ||
-    !body.nome.trim() ||
-    !Number.isSafeInteger(categoria) ||
-    categoria <= 0 ||
-    !Number.isSafeInteger(marca) ||
-    marca <= 0 ||
-    body.preco === "" ||
-    !Number.isFinite(preco) ||
-    preco < 0 ||
-    body.estoque === "" ||
-    !Number.isSafeInteger(estoque) ||
-    estoque < 0 ||
-    (body.descricao !== undefined && typeof body.descricao !== "string")
-  ) {
+  //nome obrigatorio
+  if (typeof body.nome != "string" || body.nome.trim() == "") {
     return null;
   }
+  //categoria e marca: id inteiro maior que zero
+  if (!Number.isInteger(categoria) || categoria <= 0) {
+    return null;
+  }
+  if (!Number.isInteger(marca) || marca <= 0) {
+    return null;
+  }
+  //preco: numero maior ou igual a zero
+  if (body.preco === "" || !Number.isFinite(preco) || preco < 0) {
+    return null;
+  }
+  //estoque: inteiro maior ou igual a zero
+  if (body.estoque === "" || !Number.isInteger(estoque) || estoque < 0) {
+    return null;
+  }
+  //descricao e opcional, mas se vier tem que ser texto
+  let descricao = "";
+  if (body.descricao !== undefined) {
+    if (typeof body.descricao != "string") {
+      return null;
+    }
+    descricao = body.descricao.trim();
+  }
 
-  return [
+  return new Produtos(
+    id,
     categoria,
     marca,
     body.nome.trim(),
-    typeof body.descricao === "string" ? body.descricao.trim() : "",
+    descricao,
     preco,
     estoque,
-  ];
+  );
 }
 
 class ProdutoController {
   async listar(req, res) {
-    const produtos = await new Produtos().listarDetalhado();
-    return res.send(produtos);
+    let produtos = await new Produtos().listarDetalhado();
+    res.send(produtos);
   }
 
   async produtosView(req, res) {
@@ -60,37 +73,54 @@ class ProdutoController {
   }
 
   async cadastrar(req, res) {
-    const dados = lerDadosProduto(req.body);
-    if (!dados) {
-      return res.send({ ok: false });
+    let produto = montarProduto(0, req.body);
+    if (produto != null) {
+      let okRetornoBanco = await produto.cadastrar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-    const produto = new Produtos(0, ...dados);
-    const okRetornoBanco = await produto.cadastrar();
-    return res.send({ ok: okRetornoBanco });
   }
 
   async alterar(req, res) {
-    const id = Number(req.body.id);
-    const dados = lerDadosProduto(req.body);
-    if (!Number.isSafeInteger(id) || id <= 0 || !dados) {
-      return res.send({ ok: false });
+    let id = req.body.id;
+    let produto = montarProduto(id, req.body);
+    if (id && id > 0 && produto != null) {
+      let okRetornoBanco = await produto.alterar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-    const produto = new Produtos(id, ...dados);
-    const okRetornoBanco = await produto.alterar();
-    return res.send({ ok: okRetornoBanco });
   }
 
   //exclusao via fetch
   async excluir(req, res) {
-    const id = Number(req.params.id);
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      return res.send({ ok: false });
+    let idExclusao = req.params.id;
+    if (idExclusao && idExclusao > 0) {
+      let produto = new Produtos();
+      if (await produto.possuiPedidos(idExclusao)) {
+        res.send({
+          ok: false,
+          erro: "Este produto está em pedidos e não pode ser excluído.",
+        });
+      } else if (await produto.possuiLotes(idExclusao)) {
+        res.send({
+          ok: false,
+          erro: "Este produto possui lotes no estoque e não pode ser excluído.",
+        });
+      } else if (await produto.possuiPromocoes(idExclusao)) {
+        res.send({
+          ok: false,
+          erro: "Este produto está em uma promoção e não pode ser excluído.",
+        });
+      } else {
+        let result = await produto.excluir(idExclusao);
+        res.send({ ok: result });
+      }
+    } else {
+      res.send({ ok: false });
     }
-    const produto = new Produtos();
-    const okRetornoBanco = await produto.excluir(id);
-    return res.send({ ok: okRetornoBanco });
   }
-
 }
 
 module.exports = ProdutoController;

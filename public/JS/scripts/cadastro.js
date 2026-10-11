@@ -118,6 +118,24 @@ function limparTodosErros(form) {
 
 // ── VALIDAÇÕES REUTILIZÁVEIS ──────────────────────────────────
 
+// usado nos campos opcionais: só valida quando o usuário digitou algo
+function campoPreenchido(input) {
+  return input.value.trim() != "";
+}
+
+// Estado é opcional, mas se vier tem que ser a sigla (SP, RJ...)
+function validaEstadoOpcional(input) {
+  if (!campoPreenchido(input)) {
+    return true;
+  }
+  if (input.value.trim().length != 2) {
+    marcarErro(input, "Use a sigla do estado. Ex.: SP");
+    return false;
+  }
+  marcarValido(input);
+  return true;
+}
+
 function validaCampoVazio(input, mensagem) {
   if (input.value.trim() === "") {
     marcarErro(input, mensagem);
@@ -358,50 +376,34 @@ async function validarCadastro(event, tipoForm) {
 
     if (!validaCPF(document.querySelector("#CPF"))) valido = false;
 
-    // RG: mínimo 8 dígitos
-    let inputRG = document.querySelector("#RG");
-    if (inputRG.value.replace(/\D/g, "").length < 8) {
-      marcarErro(inputRG, "RG incompleto.");
-      valido = false;
-    } else {
-      marcarValido(inputRG);
-    }
-
-
     if (!validaEmail(document.querySelector("#emailSocio"))) valido = false;
     if (!validaTelefone(document.querySelector("#CelularSocio")))
       valido = false;
-    if (!validaTelefone(document.querySelector("#TelefoneSocio")))
-      valido = false;
-    if (!validaCEP(document.querySelector("#CEPSocio"))) valido = false;
 
-    if (
-      !validaCampoVazio(
-        document.querySelector("#CidadeSocio"),
-        "Informe a cidade.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#EstadoSocio"),
-        "Informe o estado.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#BairroSocio"),
-        "Informe o bairro.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#numberRedSocio"),
-        "Informe o número.",
-      )
-    )
+    // ── OPCIONAIS: só confere se o campo foi preenchido ──
+
+    // RG: mínimo 8 dígitos
+    let inputRG = document.querySelector("#RG");
+    if (campoPreenchido(inputRG)) {
+      if (inputRG.value.replace(/\D/g, "").length < 8) {
+        marcarErro(inputRG, "RG incompleto.");
+        valido = false;
+      } else {
+        marcarValido(inputRG);
+      }
+    }
+
+    let inputTelefoneSocio = document.querySelector("#TelefoneSocio");
+    if (campoPreenchido(inputTelefoneSocio)) {
+      if (!validaTelefone(inputTelefoneSocio)) valido = false;
+    }
+
+    let inputCEPSocio = document.querySelector("#CEPSocio");
+    if (campoPreenchido(inputCEPSocio)) {
+      if (!validaCEP(inputCEPSocio)) valido = false;
+    }
+
+    if (!validaEstadoOpcional(document.querySelector("#EstadoSocio")))
       valido = false;
 
     if (
@@ -431,69 +433,50 @@ async function validarCadastro(event, tipoForm) {
       marcarValido(inputRazao);
     }
 
-    if (
-      !validaCampoVazio(
-        document.querySelector("#fantasyname"),
-        "Informe o nome fantasia.",
-      )
-    )
-      valido = false;
     if (!validaCNPJ(document.querySelector("#CNPJ"))) valido = false;
-
-    // Nome do Responsável: mínimo 2 palavras
-    let inputResp = document.querySelector("#nameFornecedor");
-    if (inputResp.value.trim() === "") {
-      marcarErro(inputResp, "Informe o nome do responsável.");
-      valido = false;
-    } else if (
-      inputResp.value
-        .trim()
-        .split(" ")
-        .filter(function (p) {
-          return p;
-        }).length < 2
-    ) {
-      marcarErro(inputResp, "Informe nome e sobrenome do responsável.");
-      valido = false;
-    } else {
-      marcarValido(inputResp);
-    }
-
-    if (!validaCPF(document.querySelector("#CPFFornecedor"))) valido = false;
     if (!validaEmail(document.querySelector("#emailFornecedor")))
-      valido = false;
-    if (!validaTelefone(document.querySelector("#TelefoneComercialFornecedor")))
       valido = false;
     if (!validaTelefone(document.querySelector("#CelularFornecedor")))
       valido = false;
-    if (!validaCEP(document.querySelector("#CEPFornecedor"))) valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#CidadeFornecedor"),
-        "Informe a cidade.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#EstadoFornecedor"),
-        "Informe o estado.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#BairroFornecedor"),
-        "Informe o bairro.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#numberRedFornecedor"),
-        "Informe o número.",
-      )
-    )
+
+    // ── OPCIONAIS: só confere se o campo foi preenchido ──
+
+    // Nome do Responsável: mínimo 2 palavras
+    let inputResp = document.querySelector("#nameFornecedor");
+    if (campoPreenchido(inputResp)) {
+      if (
+        inputResp.value
+          .trim()
+          .split(" ")
+          .filter(function (p) {
+            return p;
+          }).length < 2
+      ) {
+        marcarErro(inputResp, "Informe nome e sobrenome do responsável.");
+        valido = false;
+      } else {
+        marcarValido(inputResp);
+      }
+    }
+
+    let inputCPFFornecedor = document.querySelector("#CPFFornecedor");
+    if (campoPreenchido(inputCPFFornecedor)) {
+      if (!validaCPF(inputCPFFornecedor)) valido = false;
+    }
+
+    let inputTelefoneFornecedor = document.querySelector(
+      "#TelefoneComercialFornecedor",
+    );
+    if (campoPreenchido(inputTelefoneFornecedor)) {
+      if (!validaTelefone(inputTelefoneFornecedor)) valido = false;
+    }
+
+    let inputCEPFornecedor = document.querySelector("#CEPFornecedor");
+    if (campoPreenchido(inputCEPFornecedor)) {
+      if (!validaCEP(inputCEPFornecedor)) valido = false;
+    }
+
+    if (!validaEstadoOpcional(document.querySelector("#EstadoFornecedor")))
       valido = false;
 
     // Forma de pagamento: obrigatória

@@ -183,6 +183,49 @@ class Pedidos {
     }));
   }
 
+  //muda o status do pedido (tela de Pedidos do admin), numa transacao.
+  //pedido Entregue ou Cancelado esta encerrado e nao muda mais.
+  //Cancelado devolve as quantidades dos itens ao estoque.
+  async alterarStatus(id, novoStatus) {
+    let banco = new Database();
+    return await banco.ExecutaTransacao(async function (executar) {
+      let pedidos = await executar(
+        "select STATUS_PEDIDO from PEDIDOS where ID_PEDIDO = ? for update",
+        [id],
+      );
+      if (pedidos.length == 0) {
+        return { ok: false, erro: "Pedido não encontrado." };
+      }
+
+      let statusAtual = pedidos[0]["STATUS_PEDIDO"];
+      if (statusAtual == "Entregue" || statusAtual == "Cancelado") {
+        return {
+          ok: false,
+          erro: "Este pedido já está " + statusAtual + " e não pode mudar de status.",
+        };
+      }
+
+      if (novoStatus == "Cancelado") {
+        let itens = await executar(
+          "select ID_PRODUTO, QNT_PEDIDO from ITENS_PEDIDOS where ID_PEDIDO = ?",
+          [id],
+        );
+        for (let i = 0; i < itens.length; i++) {
+          await executar(
+            "update PRODUTOS set QNT_ESTOQUE = QNT_ESTOQUE + ? where ID_PRODUTO = ?",
+            [itens[i]["QNT_PEDIDO"], itens[i]["ID_PRODUTO"]],
+          );
+        }
+      }
+
+      await executar(
+        "update PEDIDOS set STATUS_PEDIDO = ? where ID_PEDIDO = ?",
+        [novoStatus, id],
+      );
+      return { ok: true };
+    });
+  }
+
   async excluir(id) {
     let sql = "delete from PEDIDOS where ID_PEDIDO = ?";
     let valores = [id];

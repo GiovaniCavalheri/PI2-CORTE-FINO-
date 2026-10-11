@@ -207,14 +207,36 @@ class Cliente {
     return banco.ExecutaComandoLastInserted(sql, valores);
   }
 
+  //exclui o cliente numa transacao, apagando junto o historico de pedidos
+  //(o controller so chama aqui se nao houver pedido em aberto)
   async excluir(id) {
-    let sql = "delete from CLIENTE where ID_CLIENTE = ?";
+    let banco = new Database();
+    return await banco.ExecutaTransacao(async function (executar) {
+      await executar(
+        "delete from ENTREGA_PEDIDO where ID_PEDIDO in (select ID_PEDIDO from PEDIDOS where ID_CLIENTE = ?)",
+        [id],
+      );
+      await executar(
+        "delete from ITENS_PEDIDOS where ID_PEDIDO in (select ID_PEDIDO from PEDIDOS where ID_CLIENTE = ?)",
+        [id],
+      );
+      await executar("delete from PEDIDOS where ID_CLIENTE = ?", [id]);
+      let cliente = await executar("delete from CLIENTE where ID_CLIENTE = ?", [id]);
+      return cliente.affectedRows > 0;
+    });
+  }
+
+  //usado antes de excluir: o cliente (socio) nao pode ter pedido em aberto.
+  //pedido em aberto = qualquer status que nao seja 'Entregue' nem 'Cancelado'
+  async possuiPedidosEmAberto(id) {
+    let sql =
+      "select count(*) as total from PEDIDOS where ID_CLIENTE = ? and STATUS_PEDIDO not in ('Entregue', 'Cancelado')";
     let valores = [id];
 
     let banco = new Database();
-    let result = await banco.ExecutaComandoNonQuery(sql, valores);
+    let linhas = await banco.ExecutaComando(sql, valores);
 
-    return result;
+    return linhas[0]["total"] > 0;
   }
 
   async listar() {

@@ -2,53 +2,62 @@ const Marca = require("../models/marcaModel");
 
 class MarcaController {
   async listar(req, res) {
-    const marcas = await new Marca().listar();
-    return res.send(
-      marcas.map((marca) => ({
-        id: marca.id,
-        nomeMarca: marca.nomeMarca,
-      })),
-    );
+    let marcas = await new Marca().listar();
+
+    //monta a lista so com os campos que a tela usa
+    let lista = [];
+    for (let i = 0; i < marcas.length; i++) {
+      lista.push({
+        id: marcas[i].id,
+        nomeMarca: marcas[i].nomeMarca,
+      });
+    }
+    res.send(lista);
   }
 
   async cadastrar(req, res) {
-    const { nome } = req.body;
-    if (typeof nome !== "string" || !nome.trim()) {
-      return res.send({ ok: false });
-    }
+    let nome = req.body.nome;
 
-    const marca = new Marca(0, nome.trim());
-    const okRetornoBanco = await marca.cadastrar();
-    return res.send({ ok: okRetornoBanco });
+    if (typeof nome == "string" && nome.trim() != "") {
+      let marca = new Marca(0, nome.trim());
+      let okRetornoBanco = await marca.cadastrar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
+    }
   }
 
   async alterar(req, res) {
-    const { id, nome } = req.body;
-    const idMarca = Number(id);
+    let id = req.body.id;
+    let nome = req.body.nome;
 
-    if (
-      !Number.isSafeInteger(idMarca) ||
-      idMarca <= 0 ||
-      typeof nome !== "string" ||
-      !nome.trim()
-    ) {
-      return res.send({ ok: false });
+    if (id && id > 0 && typeof nome == "string" && nome.trim() != "") {
+      let marca = new Marca(id, nome.trim());
+      let okRetornoBanco = await marca.alterar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-
-    const marca = new Marca(idMarca, nome.trim());
-    const okRetornoBanco = await marca.alterar();
-    return res.send({ ok: okRetornoBanco });
   }
 
   //exclusao via fetch
   async excluir(req, res) {
-    const id = Number(req.params.id);
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      return res.send({ ok: false });
+    let idExclusao = req.params.id;
+    if (idExclusao && idExclusao > 0) {
+      let marca = new Marca();
+      let temProdutos = await marca.possuiProdutos(idExclusao);
+      if (temProdutos) {
+        res.send({
+          ok: false,
+          erro: "Esta marca possui produtos vinculados e não pode ser excluída.",
+        });
+      } else {
+        let result = await marca.excluir(idExclusao);
+        res.send({ ok: result });
+      }
+    } else {
+      res.send({ ok: false });
     }
-    const marca = new Marca();
-    const okRetornoBanco = await marca.excluir(id);
-    return res.send({ ok: okRetornoBanco });
   }
 }
 

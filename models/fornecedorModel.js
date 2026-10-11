@@ -203,6 +203,17 @@ class Fornecedor {
     return result;
   }
 
+  //usado antes de excluir: o fornecedor nao pode ter compras registradas
+  async possuiCompras(id) {
+    let sql = "select count(*) as total from COMPRA where ID_FORNECEDOR = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql, valores);
+
+    return linhas[0]["total"] > 0;
+  }
+
   async listar() {
     let sql = "select * from FORNECEDOR";
 

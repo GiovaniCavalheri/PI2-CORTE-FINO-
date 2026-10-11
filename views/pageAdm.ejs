@@ -60,6 +60,11 @@
           <i class="fa-solid fa-truck"></i> Fornecedores
         </a>
 
+        <div class="nav-label">Vendas</div>
+        <a class="nav-link-cf" data-section="pedidos">
+          <i class="fa-solid fa-receipt"></i> Pedidos
+        </a>
+
         <div class="nav-label">Outros</div>
         <a class="nav-link-cf" data-section="relatorios">
           <i class="fa-solid fa-chart-pie"></i> Relatorios
@@ -131,6 +136,13 @@
             <div>
               <div class="stat-value" id="totalFornecedores">0</div>
               <div class="stat-label">Fornecedores cadastrados</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
+            <div>
+              <div class="stat-value" id="totalPedidosAbertos">0</div>
+              <div class="stat-label">Pedidos em aberto</div>
             </div>
           </div>
         </div>
@@ -503,7 +515,7 @@
               <input type="text" id="socioCpf" maxlength="14" placeholder="000.000.000-00" />
             </div>
             <div>
-              <label class="form-label">RG *</label>
+              <label class="form-label">RG</label>
               <input type="text" id="socioRg" maxlength="12" placeholder="00.000.000-0" />
             </div>
             <div>
@@ -514,30 +526,30 @@
 
           <div class="form-row cols-3">
             <div>
-              <label class="form-label">Telefone *</label>
+              <label class="form-label">Telefone</label>
               <input type="text" id="socioTelefone" maxlength="14" placeholder="(99)9999-9999" />
             </div>
             <div>
-              <label class="form-label">CEP *</label>
+              <label class="form-label">CEP</label>
               <input type="text" id="socioCep" maxlength="9" placeholder="00000-000" />
             </div>
             <div>
-              <label class="form-label">Cidade *</label>
+              <label class="form-label">Cidade</label>
               <input type="text" id="socioCidade" />
             </div>
           </div>
 
           <div class="form-row cols-3">
             <div>
-              <label class="form-label">Estado (UF) *</label>
+              <label class="form-label">Estado (UF)</label>
               <input type="text" id="socioEstado" maxlength="2" placeholder="SP" />
             </div>
             <div>
-              <label class="form-label">Bairro *</label>
+              <label class="form-label">Bairro</label>
               <input type="text" id="socioBairro" />
             </div>
             <div>
-              <label class="form-label">Número *</label>
+              <label class="form-label">Número</label>
               <input type="text" id="socioNumero" maxlength="10" />
             </div>
           </div>
@@ -614,7 +626,7 @@
               <input type="text" id="fornRazao" />
             </div>
             <div>
-              <label class="form-label">Nome Fantasia *</label>
+              <label class="form-label">Nome Fantasia</label>
               <input type="text" id="fornFantasia" />
             </div>
             <div>
@@ -625,11 +637,11 @@
 
           <div class="form-row cols-3">
             <div>
-              <label class="form-label">Nome do responsável *</label>
+              <label class="form-label">Nome do responsável</label>
               <input type="text" id="fornResponsavel" />
             </div>
             <div>
-              <label class="form-label">CPF do responsável *</label>
+              <label class="form-label">CPF do responsável</label>
               <input type="text" id="fornCpfResponsavel" maxlength="14" placeholder="000.000.000-00" />
             </div>
             <div>
@@ -640,7 +652,7 @@
 
           <div class="form-row cols-3">
             <div>
-              <label class="form-label">Telefone comercial *</label>
+              <label class="form-label">Telefone comercial</label>
               <input type="text" id="fornTelefone" maxlength="14" placeholder="(99)9999-9999" />
             </div>
             <div>
@@ -648,29 +660,29 @@
               <input type="text" id="fornCelular" maxlength="14" placeholder="(99)99999-9999" />
             </div>
             <div>
-              <label class="form-label">CEP *</label>
+              <label class="form-label">CEP</label>
               <input type="text" id="fornCep" maxlength="9" placeholder="00000-000" />
             </div>
           </div>
 
           <div class="form-row cols-3">
             <div>
-              <label class="form-label">Cidade *</label>
+              <label class="form-label">Cidade</label>
               <input type="text" id="fornCidade" />
             </div>
             <div>
-              <label class="form-label">Estado (UF) *</label>
+              <label class="form-label">Estado (UF)</label>
               <input type="text" id="fornEstado" maxlength="2" placeholder="SP" />
             </div>
             <div>
-              <label class="form-label">Bairro *</label>
+              <label class="form-label">Bairro</label>
               <input type="text" id="fornBairro" />
             </div>
           </div>
 
           <div class="form-row cols-3 form-row-spaced">
             <div>
-              <label class="form-label">Número *</label>
+              <label class="form-label">Número</label>
               <input type="text" id="fornNumero" maxlength="10" />
             </div>
             <div>
@@ -717,6 +729,60 @@
               </tr>
             </thead>
             <tbody id="listaFornecedores"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════ PEDIDOS ═══════ -->
+      <div class="page-content" id="section-pedidos">
+        <div class="form-card">
+          <div class="section-title section-title-spaced">
+            <i class="fa-solid fa-filter"></i> Filtrar Pedidos
+          </div>
+          <div class="form-row cols-3">
+            <div>
+              <label class="form-label">Sócio</label>
+              <select id="filtroPedidoSocio">
+                <option value="">Todos os sócios</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Situação</label>
+              <select id="filtroPedidoStatus">
+                <option value="abertos">Em aberto</option>
+                <option value="">Todos</option>
+                <option value="Entregue">Entregues</option>
+                <option value="Cancelado">Cancelados</option>
+              </select>
+            </div>
+          </div>
+          <p class="pedidos-ajuda">
+            Pedido em aberto é todo pedido que não está Entregue nem Cancelado.
+            Sócio com pedido em aberto não pode ser excluído. Ao cancelar, as
+            quantidades voltam para o estoque.
+          </p>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">
+            <i class="fa-solid fa-list-ul"></i> Pedidos dos Sócios
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Data</th>
+                <th>Sócio</th>
+                <th>Itens</th>
+                <th>Valor</th>
+                <th>Tipo</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="listaPedidos"></tbody>
           </table>
         </div>
       </div>

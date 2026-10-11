@@ -25,6 +25,7 @@
           cadastros: "Categorias e Marcas",
           socios: "Sócios",
           fornecedores: "Fornecedores",
+          pedidos: "Pedidos",
           relatorios: "Relatorios",
         };
 
@@ -279,6 +280,7 @@
             renderizarMarcas(dados[2]);
             renderizarSocios(dados[3]);
             renderizarFornecedores(dados[4]);
+            carregarPedidos();
           } catch (erro) {
             alert("Não foi possível carregar os cadastros: " + erro.message);
           }
@@ -441,7 +443,9 @@
                 { method: "DELETE" },
               );
               if (!corpoResposta.ok) {
-                throw new Error("O servidor não excluiu o produto.");
+                throw new Error(
+                  corpoResposta.erro || "O servidor não excluiu o produto.",
+                );
               }
               await carregarListas();
             } catch (erro) {
@@ -524,7 +528,8 @@
               );
               if (!corpoResposta.ok) {
                 throw new Error(
-                  "Verifique se existe produto usando esta categoria.",
+                  corpoResposta.erro ||
+                    "Verifique se existe produto usando esta categoria.",
                 );
               }
               await carregarListas();
@@ -606,7 +611,10 @@
                 { method: "DELETE" },
               );
               if (!corpoResposta.ok) {
-                throw new Error("Verifique se existe produto usando esta marca.");
+                throw new Error(
+                  corpoResposta.erro ||
+                    "Verifique se existe produto usando esta marca.",
+                );
               }
               await carregarListas();
             } catch (erro) {
@@ -723,12 +731,15 @@
           });
           var senha = document.querySelector("#socioSenha").value;
 
-          var obrigatorios = Object.keys(camposSocio).filter(function (campo) {
-            return campo !== "complemento";
-          });
-          var faltando = obrigatorios.some(function (campo) {
-            return dados[campo] === "";
-          });
+          // obrigatorios do socio (os outros campos podem ficar vazios)
+          var obrigatorios = ["nomeCliente", "dataNascimento", "cpfCliente",
+            "emailCliente", "telefone", "dataAdesao", "dataVencimento"];
+          var faltando = false;
+          for (var i = 0; i < obrigatorios.length; i++) {
+            if (dados[obrigatorios[i]] == "") {
+              faltando = true;
+            }
+          }
           if (faltando || (!id && senha === "")) {
             alert("Preencha corretamente todos os campos obrigatorios!");
             return;
@@ -786,7 +797,7 @@
               { method: "DELETE" },
             );
             if (!socio.ok) {
-              throw new Error("O servidor não excluiu o sócio.");
+              throw new Error(socio.erro || "O servidor não excluiu o sócio.");
             }
             await carregarListas();
           } catch (erro) {
@@ -922,9 +933,15 @@
           });
           var senha = document.querySelector("#fornSenha").value;
 
-          var faltando = Object.keys(dados).some(function (campo) {
-            return dados[campo] === "";
-          });
+          // obrigatorios do fornecedor (os outros campos podem ficar vazios)
+          var obrigatorios = ["nomeFornecedor", "cnpjFornecedor",
+            "emailFornecedor", "celular", "formaPagamento"];
+          var faltando = false;
+          for (var i = 0; i < obrigatorios.length; i++) {
+            if (dados[obrigatorios[i]] == "") {
+              faltando = true;
+            }
+          }
           if (faltando || (!id && senha === "")) {
             alert("Preencha corretamente todos os campos obrigatorios!");
             return;
@@ -959,7 +976,9 @@
               { method: "DELETE" },
             );
             if (!resultado.ok) {
-              throw new Error("O servidor não excluiu o fornecedor.");
+              throw new Error(
+                resultado.erro || "O servidor não excluiu o fornecedor.",
+              );
             }
             await carregarListas();
           } catch (erro) {
@@ -979,4 +998,230 @@
           if (botaoEditar) editarFornecedor(botaoEditar);
           if (botaoExcluir) excluirFornecedor(botaoExcluir);
         });
+
+        // ──────────────────────────────────────────────
+        // PEDIDOS DOS SOCIOS
+        // ──────────────────────────────────────────────
+        var listaPedidos = document.querySelector("#listaPedidos");
+        var filtroPedidoSocio = document.querySelector("#filtroPedidoSocio");
+        var filtroPedidoStatus = document.querySelector("#filtroPedidoStatus");
+        var todosPedidos = [];
+
+        // mesmos valores do enum STATUS_PEDIDO do banco
+        var opcoesStatus = [
+          "Aguardando Separação",
+          "Em Andamento",
+          "Aguardando Pagamento",
+          "Aguardando Retirada",
+          "Em Rota de Entrega",
+          "Entregue",
+          "Cancelado",
+        ];
+
+        filtroPedidoSocio.addEventListener("change", renderizarPedidos);
+        filtroPedidoStatus.addEventListener("change", renderizarPedidos);
+        listaPedidos.addEventListener("change", mudarStatusPedido);
+
+        function carregarPedidos() {
+          fetch("/pedido/listar")
+            .then(function (resposta) {
+              return resposta.json();
+            })
+            .then(function (pedidos) {
+              todosPedidos = pedidos;
+              montarFiltroSocios();
+              renderizarPedidos();
+            })
+            .catch(function () {
+              alert("Não foi possível carregar os pedidos.");
+            });
+        }
+
+        // pedido em aberto = nao esta Entregue nem Cancelado
+        function pedidoEmAberto(pedido) {
+          return (
+            pedido.STATUS_PEDIDO != "Entregue" &&
+            pedido.STATUS_PEDIDO != "Cancelado"
+          );
+        }
+
+        // "2026-10-08 14:05:00" -> "08/10/2026 14:05"
+        function formatarDataHora(dataHora) {
+          if (!dataHora) return "";
+          var partes = dataHora.split(" ");
+          var hora = "";
+          if (partes.length > 1) {
+            hora = " " + partes[1].substring(0, 5);
+          }
+          return formatarData(partes[0]) + hora;
+        }
+
+        // coloca no filtro cada socio que tem pedido (sem repetir)
+        function montarFiltroSocios() {
+          var escolhido = filtroPedidoSocio.value;
+          filtroPedidoSocio.innerHTML =
+            '<option value="">Todos os sócios</option>';
+
+          var jaIncluidos = [];
+          for (var i = 0; i < todosPedidos.length; i++) {
+            var pedido = todosPedidos[i];
+            if (!jaIncluidos.includes(pedido.ID_CLIENTE)) {
+              jaIncluidos.push(pedido.ID_CLIENTE);
+              var opcao = document.createElement("option");
+              opcao.value = pedido.ID_CLIENTE;
+              opcao.textContent = pedido.NOME_CLIENTE;
+              filtroPedidoSocio.appendChild(opcao);
+            }
+          }
+
+          // mantem o socio que estava escolhido (se ele ainda tiver pedidos)
+          filtroPedidoSocio.value = escolhido;
+          if (filtroPedidoSocio.selectedIndex == -1) {
+            filtroPedidoSocio.value = "";
+          }
+        }
+
+        function renderizarPedidos() {
+          var socio = filtroPedidoSocio.value;
+          var situacao = filtroPedidoStatus.value;
+          var totalAbertos = 0;
+          listaPedidos.innerHTML = "";
+
+          for (var i = 0; i < todosPedidos.length; i++) {
+            var pedido = todosPedidos[i];
+            if (pedidoEmAberto(pedido)) {
+              totalAbertos++;
+            }
+
+            var mostrar = true;
+            if (socio != "" && pedido.ID_CLIENTE != socio) {
+              mostrar = false;
+            }
+            if (situacao == "abertos" && !pedidoEmAberto(pedido)) {
+              mostrar = false;
+            }
+            if (
+              situacao != "abertos" &&
+              situacao != "" &&
+              pedido.STATUS_PEDIDO != situacao
+            ) {
+              mostrar = false;
+            }
+
+            if (mostrar) {
+              listaPedidos.appendChild(criarLinhaPedido(pedido));
+            }
+          }
+
+          if (listaPedidos.children.length == 0) {
+            linhaVazia(listaPedidos, 7, "Nenhum pedido encontrado.");
+          }
+          document.querySelector("#totalPedidosAbertos").textContent =
+            totalAbertos;
+        }
+
+        function criarLinhaPedido(pedido) {
+          var linha = document.createElement("tr");
+          linha.appendChild(criarCelula(pedido.ID_PEDIDO));
+          linha.appendChild(criarCelula(formatarDataHora(pedido.DATA_PEDIDO)));
+          linha.appendChild(criarCelula(pedido.NOME_CLIENTE));
+
+          // itens: "2x Picanha"
+          var celulaItens = document.createElement("td");
+          var lista = document.createElement("ul");
+          lista.className = "itens-pedido";
+          for (var i = 0; i < pedido.ITENS.length; i++) {
+            var item = document.createElement("li");
+            item.textContent =
+              pedido.ITENS[i].QNT_PEDIDO + "x " + pedido.ITENS[i].NOME_PRODUTO;
+            lista.appendChild(item);
+          }
+          celulaItens.appendChild(lista);
+          linha.appendChild(celulaItens);
+
+          var valor = Number(pedido.VALOR_PEDIDO).toFixed(2).replace(".", ",");
+          linha.appendChild(criarCelula("R$ " + valor));
+          linha.appendChild(criarCelula(pedido.TIPO_PEDIDO));
+
+          // status: pedido em aberto pode mudar; encerrado mostra so o selo
+          var celulaStatus = document.createElement("td");
+          if (pedidoEmAberto(pedido)) {
+            var select = document.createElement("select");
+            select.className = "select-status";
+            select.dataset.id = pedido.ID_PEDIDO;
+            select.dataset.atual = pedido.STATUS_PEDIDO;
+            for (var j = 0; j < opcoesStatus.length; j++) {
+              var opcao = document.createElement("option");
+              opcao.value = opcoesStatus[j];
+              opcao.textContent = opcoesStatus[j];
+              select.appendChild(opcao);
+            }
+            select.value = pedido.STATUS_PEDIDO;
+            celulaStatus.appendChild(select);
+          } else {
+            var selo = document.createElement("span");
+            if (pedido.STATUS_PEDIDO == "Entregue") {
+              selo.className = "badge badge-ativo";
+            } else {
+              selo.className = "badge badge-inativo";
+            }
+            selo.textContent = pedido.STATUS_PEDIDO;
+            celulaStatus.appendChild(selo);
+          }
+          linha.appendChild(celulaStatus);
+
+          return linha;
+        }
+
+        function mudarStatusPedido(evento) {
+          var select = evento.target;
+          if (!select.classList.contains("select-status")) return;
+
+          var novoStatus = select.value;
+          var mensagem =
+            "Mudar o pedido nº " + select.dataset.id + ' para "' + novoStatus + '"?';
+          if (novoStatus == "Entregue" || novoStatus == "Cancelado") {
+            mensagem += "\nDepois disso o status não poderá mais ser alterado.";
+          }
+          if (novoStatus == "Cancelado") {
+            mensagem += "\nAs quantidades dos itens voltam para o estoque.";
+          }
+          if (!confirm(mensagem)) {
+            select.value = select.dataset.atual;
+            return;
+          }
+
+          var obj = {
+            id: select.dataset.id,
+            status: novoStatus,
+          };
+
+          fetch("/pedido/status", {
+            method: "POST",
+            body: JSON.stringify(obj),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then(function (resposta) {
+              return resposta.json();
+            })
+            .then(function (CorpoResposta) {
+              if (CorpoResposta.ok) {
+                alert("Status do pedido alterado com sucesso!");
+                // recarrega tudo: pedidos e o estoque dos produtos (cancelamento)
+                carregarListas();
+              } else {
+                alert(
+                  "Erro ao alterar o status: " +
+                    (CorpoResposta.erro || "tente novamente."),
+                );
+                select.value = select.dataset.atual;
+              }
+            })
+            .catch(function () {
+              alert("Não foi possível alterar o status. Tente novamente.");
+              select.value = select.dataset.atual;
+            });
+        }
       });

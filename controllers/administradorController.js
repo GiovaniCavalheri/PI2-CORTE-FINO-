@@ -1,73 +1,87 @@
 const Administrador = require("../models/administradorModel");
 
+//true se o valor for um texto que nao esta vazio
+function textoPreenchido(valor) {
+  return typeof valor == "string" && valor.trim() != "";
+}
+
 class AdministradorController {
   async cadastrar(req, res) {
-    const { nomeAdm, emailAdm, senhaAdm } = req.body;
+    let nomeAdm = req.body.nomeAdm;
+    let emailAdm = req.body.emailAdm;
+    let senhaAdm = req.body.senhaAdm;
 
     if (
-      !camposTextoValidos([nomeAdm, emailAdm, senhaAdm])
+      textoPreenchido(nomeAdm) &&
+      textoPreenchido(emailAdm) &&
+      textoPreenchido(senhaAdm)
     ) {
-      return res.send({ ok: false });
+      let administrador = new Administrador(
+        0,
+        nomeAdm.trim(),
+        emailAdm.trim(),
+        senhaAdm,
+      );
+      let okRetornoBanco = await administrador.cadastrar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-
-    const administrador = new Administrador(
-      0,
-      nomeAdm.trim(),
-      emailAdm.trim(),
-      senhaAdm,
-    );
-    const okRetornoBanco = await administrador.cadastrar();
-
-    return res.send({ ok: okRetornoBanco });
   }
 
   async listar(req, res) {
-    const administradores = await new Administrador().listar();
-    return res.send(
-      administradores.map((administrador) => ({
-        id: administrador.id,
-        nomeAdm: administrador.nomeAdm,
-        emailAdm: administrador.emailAdm,
-      })),
-    );
+    let administradores = await new Administrador().listar();
+
+    //monta a lista sem a senha
+    let lista = [];
+    for (let i = 0; i < administradores.length; i++) {
+      lista.push({
+        id: administradores[i].id,
+        nomeAdm: administradores[i].nomeAdm,
+        emailAdm: administradores[i].emailAdm,
+      });
+    }
+    res.send(lista);
   }
 
+  //altera nome/e-mail, a senha, ou os dois (depende do que vier no body)
   async alterar(req, res) {
-    const { id, nomeAdm, emailAdm, senhaAdm } = req.body;
-    const idAdministrador = Number(id);
-    const deveAlterarDados =
-      nomeAdm !== undefined || emailAdm !== undefined;
-    const deveAlterarSenha =
-      typeof senhaAdm === "string" && senhaAdm.trim().length > 0;
+    let id = req.body.id;
+    let nomeAdm = req.body.nomeAdm;
+    let emailAdm = req.body.emailAdm;
+    let senhaAdm = req.body.senhaAdm;
 
-    if (
-      !Number.isSafeInteger(idAdministrador) ||
-      idAdministrador <= 0 ||
-      (deveAlterarDados && !camposTextoValidos([nomeAdm, emailAdm])) ||
-      (!deveAlterarDados && !deveAlterarSenha)
-    ) {
-      return res.send({ ok: false });
+    let alterarDados = nomeAdm !== undefined || emailAdm !== undefined;
+    let alterarSenha = textoPreenchido(senhaAdm);
+
+    //precisa de um id valido e de alguma coisa para alterar
+    if (!(id && id > 0) || (!alterarDados && !alterarSenha)) {
+      res.send({ ok: false });
+      return;
+    }
+    //se for alterar os dados, nome e e-mail sao obrigatorios
+    if (alterarDados && (!textoPreenchido(nomeAdm) || !textoPreenchido(emailAdm))) {
+      res.send({ ok: false });
+      return;
     }
 
-    const administrador = new Administrador(
-      idAdministrador,
-      deveAlterarDados ? nomeAdm.trim() : undefined,
-      deveAlterarDados ? emailAdm.trim() : undefined,
-      senhaAdm,
-    );
-    const okDados = deveAlterarDados ? await administrador.alterar() : true;
-    const okSenha = deveAlterarSenha
-      ? await administrador.alterarSenha()
-      : true;
+    let administrador = new Administrador(id, undefined, undefined, senhaAdm);
+    if (alterarDados) {
+      administrador.nomeAdm = nomeAdm.trim();
+      administrador.emailAdm = emailAdm.trim();
+    }
 
-    return res.send({ ok: okDados && okSenha });
+    let okDados = true;
+    if (alterarDados) {
+      okDados = await administrador.alterar();
+    }
+    let okSenha = true;
+    if (alterarSenha) {
+      okSenha = await administrador.alterarSenha();
+    }
+
+    res.send({ ok: okDados && okSenha });
   }
-}
-
-function camposTextoValidos(campos) {
-  return campos.every(
-    (campo) => typeof campo === "string" && campo.trim().length > 0,
-  );
 }
 
 module.exports = AdministradorController;

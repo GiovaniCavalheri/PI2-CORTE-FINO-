@@ -104,6 +104,38 @@ class Produtos {
     return result;
   }
 
+  //usados antes de excluir: o produto nao pode estar em pedido, lote ou promocao
+  async possuiPedidos(id) {
+    let sql = "select count(*) as total from ITENS_PEDIDOS where ID_PRODUTO = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql, valores);
+
+    return linhas[0]["total"] > 0;
+  }
+
+  async possuiLotes(id) {
+    let sql = "select count(*) as total from LOTE where ID_PRODUTO = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql, valores);
+
+    return linhas[0]["total"] > 0;
+  }
+
+  async possuiPromocoes(id) {
+    let sql =
+      "select count(*) as total from PROMOCAO_PRODUTO where ID_PRODUTO = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql, valores);
+
+    return linhas[0]["total"] > 0;
+  }
+
   async listar() {
     let sql = "select * from PRODUTOS";
 

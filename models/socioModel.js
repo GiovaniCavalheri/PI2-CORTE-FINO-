@@ -44,13 +44,26 @@ class Socio {
     return result;
   }
 
-  //exclui o socio e os dados dele em CLIENTE (ID_SOCIO = ID_CLIENTE) numa transacao:
-  //se o cliente tiver pedidos, a chave estrangeira bloqueia e nada e apagado
+  //exclui o socio e os dados dele em CLIENTE (ID_SOCIO = ID_CLIENTE) numa transacao.
+  //o controller so chama aqui se nao houver pedido em aberto: o historico
+  //(pedidos Entregues/Cancelados, itens e entregas) e apagado junto.
+  //se algo der errado no meio, nada e apagado
   async excluir(id) {
     let banco = new Database();
-    return banco.ExecutaTransacao(async (executar) => {
+    return await banco.ExecutaTransacao(async function (executar) {
       let socio = await executar("delete from SOCIO where ID_SOCIO = ?", [id]);
-      if (socio.affectedRows === 0) return false;
+      if (socio.affectedRows == 0) {
+        return false;
+      }
+      await executar(
+        "delete from ENTREGA_PEDIDO where ID_PEDIDO in (select ID_PEDIDO from PEDIDOS where ID_CLIENTE = ?)",
+        [id],
+      );
+      await executar(
+        "delete from ITENS_PEDIDOS where ID_PEDIDO in (select ID_PEDIDO from PEDIDOS where ID_CLIENTE = ?)",
+        [id],
+      );
+      await executar("delete from PEDIDOS where ID_CLIENTE = ?", [id]);
       await executar("delete from CLIENTE where ID_CLIENTE = ?", [id]);
       return true;
     });

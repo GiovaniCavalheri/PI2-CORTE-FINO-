@@ -53,6 +53,17 @@ class CategoriasProduto {
     return result;
   }
 
+  //usado antes de excluir: a categoria nao pode ter produtos vinculados
+  async possuiProdutos(id) {
+    let sql = "select count(*) as total from PRODUTOS where ID_CATEGORIA = ?";
+    let valores = [id];
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql, valores);
+
+    return linhas[0]["total"] > 0;
+  }
+
   async listar() {
     let sql = "select * from CATEGORIAS_PRODUTO";
 

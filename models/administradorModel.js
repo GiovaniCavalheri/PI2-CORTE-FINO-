@@ -87,6 +87,24 @@ class Administrador {
     return lista;
   }
 
+  //usado no login: traz a senha para comparar com a digitada
+  async buscarPorEmail(email) {
+    let sql =
+      "select ID_ADM, NOME_ADM, EMAIL_ADM, SENHA_ADM from ADMINISTRADOR where EMAIL_ADM = ?";
+
+    let banco = new Database();
+    let linhas = await banco.ExecutaComando(sql, [email]);
+    if (linhas.length === 0) return null;
+
+    let linha = linhas[0];
+    return new Administrador(
+      linha["ID_ADM"],
+      linha["NOME_ADM"],
+      linha["EMAIL_ADM"],
+      linha["SENHA_ADM"],
+    );
+  }
+
   async alterar() {
     let sql =
       "update ADMINISTRADOR set NOME_ADM = ?, EMAIL_ADM = ? where ID_ADM = ?";

@@ -85,11 +85,40 @@
   font-weight: 600;
 }
 
+/* usuario logado no header */
+.usuario-logado {
+  cursor: default;
+  white-space: nowrap;
+}
+
+.link-sair {
+  font-size: 0.85rem;
+}
+
+/* quantidade de itens no carrinho (header) */
+.contador-carrinho {
+  display: inline-block;
+  min-width: 20px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 10px;
+  background: var(--cor-vermelho);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+}
+
+.contador-carrinho[hidden] {
+  display: none;
+}
+
 /* HERO */
 .hero-section-index {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)),
-    url("/src/public/index-images/testeBack.png");
+    url("/images/index-images/testeBack.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -552,7 +581,7 @@
 .hero-section {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)),
-    url("/src/public/index-images/image-product-background.png");
+    url("/images/index-images/image-product-background.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -931,7 +960,7 @@
 .hero-section1 {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)),
-    url("/src/public/index-images/about-background.png");
+    url("/images/index-images/about-background.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -996,7 +1025,7 @@
 .hero-section3 {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)),
-    url("/src/public/index-images/background-services.png");
+    url("/images/index-images/background-services.png");
   background-size: cover;
   background-position: center;
   color: white;

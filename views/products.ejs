@@ -82,11 +82,34 @@
         <p>Nenhum produto cadastrado no momento.</p>
         <% } %>
 
+        <%
+          // imagem padrao de cada tipo (chave = nome da categoria sem acento e minusculo)
+          const imagensPorTipo = {
+            bovino: "/images/Cards-Produtos/picanha-bovina-card.png",
+            suino: "/images/Cards-Produtos/panceta-products.png",
+            ave: "/images/Cards-Produtos/frango-resfriado-products.png",
+            kit: "/images/Cards-Produtos/kit-churrasco-products.png",
+          };
+        %>
         <% for (let i = 0; i < produtos.length; i++) { %>
-        <div class="cartao-produto">
+        <%
+          const tipo = String(produtos[i].NOME_CATEGORIA || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+          const chaveImagem = Object.keys(imagensPorTipo).find((chave) => tipo.startsWith(chave));
+        %>
+        <div
+          class="cartao-produto"
+          data-tipo="<%= tipo %>"
+          data-id="<%= produtos[i].ID_PRODUTO %>"
+          data-preco="<%= produtos[i].PRECO_VENDA %>"
+          data-estoque="<%= produtos[i].QNT_ESTOQUE %>"
+        >
           <div class="area-img-produto">
             <img
-              src="/images/Cards-Produtos/picanha-bovina-card.png"
+              src="<%= imagensPorTipo[chaveImagem] || imagensPorTipo.bovino %>"
               class="img-produto"
               alt="<%= produtos[i].NOME_PRODUTO %>"
             />
@@ -102,7 +125,11 @@
               <span class="unidade-preco">/kg</span>
             </div>
 
+            <% if (produtos[i].QNT_ESTOQUE > 0) { %>
             <button class="btn-adicionar">Adicionar ao Pedido</button>
+            <% } else { %>
+            <button class="btn-adicionar" disabled>Esgotado</button>
+            <% } %>
           </div>
         </div>
         <% } %>

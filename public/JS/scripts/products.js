@@ -1,52 +1,70 @@
-// BOTÕES DE FILTRO
-const botoesFiltro = document.querySelectorAll(".botao-filtro");
-const produtos = document.querySelectorAll(".cartao-produto");
+document.addEventListener("DOMContentLoaded", function() {
 
-botoesFiltro.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    botoesFiltro.forEach((b) => b.classList.remove("ativo"));
-    btn.classList.add("ativo");
+    // BOTÕES DE FILTRO E BUSCA
+    let botoesFiltro = document.querySelectorAll(".botao-filtro");
+    let produtos = document.querySelectorAll(".cartao-produto");
+    let campoBusca = document.querySelector("#busca");
 
-    const categoria = btn.dataset.categoria;
+    let filtroAtual = "todos";
 
-    produtos.forEach((produto) => {
-      const tipo = produto.dataset.tipo;
+    for(let i=0; i<botoesFiltro.length; i++) {
+        botoesFiltro[i].addEventListener("click", filtrar);
+    }
 
-      if (categoria === "todos" || tipo === categoria) {
-        produto.style.display = "block";
-      } else {
-        produto.style.display = "none";
-      }
-    });
-  });
-});
+    // BUSCA
+    if(campoBusca != null) {
+        campoBusca.addEventListener("input", aplicarFiltros);
+    }
 
-// BUSCA
-const campoBusca = document.getElementById("busca");
+    //clique em um botao de filtro: marca ele como ativo e filtra os produtos
+    function filtrar() {
+        for(let i=0; i<botoesFiltro.length; i++) {
+            botoesFiltro[i].classList.remove("ativo");
+        }
+        this.classList.add("ativo");
 
-campoBusca.addEventListener("input", () => {
-  const termo = campoBusca.value.toLowerCase();
+        filtroAtual = this.dataset.categoria;
+        aplicarFiltros();
+    }
 
-  produtos.forEach((produto) => {
-    const nome = produto
-      .querySelector(".nome-produto")
-      .textContent.toLowerCase();
+    // "Suínos" -> "suino" / "Kits Especiais" -> "kit": tira acento e o plural
+    // para o botão casar com o nome da categoria vindo do banco
+    function raizDoTipo(texto) {
+        //tira os acentos (á -> a, í -> i)
+        texto = texto.normalize("NFD").replace(/[̀-ͯ]/g, "");
+        //minusculo, sem espacos nas pontas e so a primeira palavra
+        texto = texto.toLowerCase().trim().split(" ")[0];
+        //tira o "s" do final (plural)
+        if(texto.charAt(texto.length - 1) == "s") {
+            texto = texto.substring(0, texto.length - 1);
+        }
+        return texto;
+    }
 
-    produto.style.display = nome.includes(termo) ? "block" : "none";
-  });
-});
+    function aplicarFiltros() {
+        let termo = "";
+        if(campoBusca != null) {
+            termo = campoBusca.value.toLowerCase().trim();
+        }
+        let raizFiltro = raizDoTipo(filtroAtual);
 
-// BOTÃO "ADICIONAR AO PEDIDO"
-const botoesAdicionar = document.querySelectorAll(".btn-adicionar");
+        for(let i=0; i<produtos.length; i++) {
+            let produto = produtos[i];
+            let tipo = produto.dataset.tipo || "";
+            let nome = produto.querySelector(".nome-produto").textContent.toLowerCase();
 
-botoesAdicionar.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    btn.textContent = "✓ Adicionado!";
-    btn.style.backgroundColor = "#2ecc71";
+            let passaCategoria = filtroAtual == "todos" || raizDoTipo(tipo) == raizFiltro;
+            let passaBusca = nome.includes(termo);
 
-    setTimeout(() => {
-      btn.textContent = "Adicionar ao Pedido";
-      btn.style.backgroundColor = "#853439";
-    }, 1600);
-  });
-});
+            if(passaCategoria && passaBusca) {
+                produto.style.display = "block";
+            }
+            else {
+                produto.style.display = "none";
+            }
+        }
+    }
+
+    // o botão "Adicionar ao Pedido" é tratado em cart.js
+
+})

@@ -1,75 +1,101 @@
-const CHAVE_CARRINHO = "carrinho_corte_fino";
+document.addEventListener("DOMContentLoaded", function() {
 
-function lerCarrinho() {
-  const dados = localStorage.getItem(CHAVE_CARRINHO);
-  return dados ? JSON.parse(dados) : [];
-}
+    let CHAVE_CARRINHO = "carrinho_corte_fino";
 
-function salvarCarrinho(itens) {
-  localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(itens));
-}
+    let botoes = document.querySelectorAll(".btn-adicionar:not([disabled])");
+    for(let i=0; i<botoes.length; i++) {
+        botoes[i].addEventListener("click", adicionarAoCarrinho);
+    }
 
-function adicionarAoCarrinho(botao) {
-  // 1. Sobe pelo DOM até encontrar o cartão pai
-  const cartao = botao.closest(".cartao-produto");
+    function lerCarrinho() {
+        let dados = localStorage.getItem(CHAVE_CARRINHO);
+        if(dados == null) {
+            return [];
+        }
+        try {
+            return JSON.parse(dados);
+        }
+        catch(erro) {
+            return [];
+        }
+    }
 
-  // 2. Coleta os dados do produto diretamente do HTML
-  const nome = cartao.querySelector(".nome-produto").textContent.trim();
-  const categoria = cartao
-    .querySelector(".categoria-produto")
-    .textContent.trim();
-  const imagem = cartao.querySelector(".img-produto")?.src || "";
-  const tipo = cartao.dataset.tipo; 
-  const precoTexto = cartao.querySelector(".preco-atual").textContent;
-  const preco = parseFloat(
-    precoTexto
-      .replace("R$", "") 
-      .replace(".", "") 
-      .replace(",", ".") 
-      .trim(),
-  );
+    function salvarCarrinho(itens) {
+        localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(itens));
 
-  const id = `${tipo}-${nome.toLowerCase().replace(/\s+/g, "-")}`;
+        if(window.atualizarContadorCarrinho) {
+            window.atualizarContadorCarrinho();
+        }
+    }
 
-  const itens = lerCarrinho();
-  const itemExistente = itens.find((item) => item.id === id);
+    function adicionarAoCarrinho() {
+        let botao = this;
 
-  if (itemExistente) {
-    itemExistente.quantidade += 1;
-  } else {
-    itens.push({
-      id,
-      nome,
-      categoria,
-      imagem,
-      preco,
-      quantidade: 1,
-    });
-  }
+        let cartao = botao.closest(".cartao-produto");
 
-  salvarCarrinho(itens);
-  feedbackBotao(botao);
-}
+        let idProduto = Number(cartao.dataset.id);
+        let preco = Number(cartao.dataset.preco);
+        let estoque = Number(cartao.dataset.estoque);
+        let nome = cartao.querySelector(".nome-produto").textContent.trim();
+        let categoria = cartao.querySelector(".categoria-produto").textContent.trim();
+        let imagem = "";
+        let img = cartao.querySelector(".img-produto");
+        if(img != null) {
+            imagem = img.src;
+        }
 
-function feedbackBotao(botao) {
-  const textoOriginal = botao.textContent;
-  botao.textContent = "Adicionado!";
-  botao.disabled = true;
-  botao.style.background = "#4a9e6f"; 
+        let id = "produto-" + idProduto;
 
-  setTimeout(() => {
-    botao.textContent = textoOriginal;
-    botao.disabled = false;
-    botao.style.background = ""; 
-  }, 1500);
-}
+        let itens = lerCarrinho();
+        let itemExistente = null;
+        for(let i=0; i<itens.length; i++) {
+            if(itens[i].id == id) {
+                itemExistente = itens[i];
+            }
+        }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const botoes = document.querySelectorAll(".btn-adicionar");
+        let quantidadeAtual = 0;
+        if(itemExistente != null) {
+            quantidadeAtual = itemExistente.quantidade;
+        }
 
-  botoes.forEach((botao) => {
-    botao.addEventListener("click", () => {
-      adicionarAoCarrinho(botao);
-    });
-  });
-});
+        if(quantidadeAtual >= estoque) {
+            feedbackBotao(botao, "Sem estoque suficiente", "#a33");
+            return;
+        }
+
+        if(itemExistente != null) {
+            itemExistente.quantidade = itemExistente.quantidade + 1;
+            itemExistente.estoque = estoque;
+        }
+        else {
+            itens.push({
+                id: id,
+                idProduto: idProduto,
+                nome: nome,
+                categoria: categoria,
+                imagem: imagem,
+                preco: preco,
+                estoque: estoque,
+                quantidade: 1
+            });
+        }
+
+        salvarCarrinho(itens);
+        feedbackBotao(botao, "Adicionado!", "#4a9e6f");
+    }
+
+    function feedbackBotao(botao, texto, cor) {
+        let textoOriginal = botao.textContent;
+        botao.textContent = texto;
+        botao.disabled = true;
+        botao.style.background = cor;
+
+        setTimeout(function() {
+            botao.textContent = textoOriginal;
+            botao.disabled = false;
+            botao.style.background = "";
+        }, 1500);
+    }
+
+})

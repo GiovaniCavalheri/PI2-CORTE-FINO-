@@ -2,61 +2,76 @@ const CategoriasProduto = require("../models/categoriaProdutoModel");
 
 class CategoriaController {
   async listar(req, res) {
-    const categorias = await new CategoriasProduto().listar();
-    return res.send(
-      categorias.map((categoria) => ({
-        id: categoria.id,
-        nomeCategoria: categoria.nomeCategoria,
-        descricao: categoria.descricao,
-      })),
-    );
+    let categorias = await new CategoriasProduto().listar();
+
+    //monta a lista so com os campos que a tela usa
+    let lista = [];
+    for (let i = 0; i < categorias.length; i++) {
+      lista.push({
+        id: categorias[i].id,
+        nomeCategoria: categorias[i].nomeCategoria,
+        descricao: categorias[i].descricao,
+      });
+    }
+    res.send(lista);
   }
 
   async cadastrar(req, res) {
-    const { nome, descricao } = req.body;
-    if (typeof nome !== "string" || !nome.trim()) {
-      return res.send({ ok: false });
-    }
+    let nome = req.body.nome;
+    let descricao = req.body.descricao;
 
-    const categoria = new CategoriasProduto(
-      0,
-      nome.trim(),
-      typeof descricao === "string" ? descricao.trim() : "",
-    );
-    const okRetornoBanco = await categoria.cadastrar();
-    return res.send({ ok: okRetornoBanco });
+    if (typeof nome == "string" && nome.trim() != "") {
+      if (typeof descricao == "string") {
+        descricao = descricao.trim();
+      } else {
+        descricao = "";
+      }
+
+      let categoria = new CategoriasProduto(0, nome.trim(), descricao);
+      let okRetornoBanco = await categoria.cadastrar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
+    }
   }
 
   async alterar(req, res) {
-    const { id, nome, descricao } = req.body;
-    const idCategoria = Number(id);
+    let id = req.body.id;
+    let nome = req.body.nome;
+    let descricao = req.body.descricao;
 
-    if (
-      !Number.isSafeInteger(idCategoria) ||
-      idCategoria <= 0 ||
-      typeof nome !== "string" ||
-      !nome.trim()
-    ) {
-      return res.send({ ok: false });
+    if (id && id > 0 && typeof nome == "string" && nome.trim() != "") {
+      if (typeof descricao == "string") {
+        descricao = descricao.trim();
+      } else {
+        descricao = "";
+      }
+
+      let categoria = new CategoriasProduto(id, nome.trim(), descricao);
+      let okRetornoBanco = await categoria.alterar();
+      res.send({ ok: okRetornoBanco });
+    } else {
+      res.send({ ok: false });
     }
-
-    const categoria = new CategoriasProduto(
-      idCategoria,
-      nome.trim(),
-      typeof descricao === "string" ? descricao.trim() : "",
-    );
-    const okRetornoBanco = await categoria.alterar();
-    return res.send({ ok: okRetornoBanco });
   }
 
   async excluir(req, res) {
-    const id = Number(req.params.id);
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      return res.send({ ok: false });
+    let idExclusao = req.params.id;
+    if (idExclusao && idExclusao > 0) {
+      let categoria = new CategoriasProduto();
+      let temProdutos = await categoria.possuiProdutos(idExclusao);
+      if (temProdutos) {
+        res.send({
+          ok: false,
+          erro: "Esta categoria possui produtos vinculados e não pode ser excluída.",
+        });
+      } else {
+        let result = await categoria.excluir(idExclusao);
+        res.send({ ok: result });
+      }
+    } else {
+      res.send({ ok: false });
     }
-    const categoria = new CategoriasProduto();
-    const okRetornoBanco = await categoria.excluir(id);
-    return res.send({ ok: okRetornoBanco });
   }
 }
 

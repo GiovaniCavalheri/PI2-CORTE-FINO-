@@ -8,6 +8,8 @@ const AdministradorController = require("../controllers/administradorController"
 const FornecedorController = require("../controllers/fornecedorController");
 const SocioController = require("../controllers/socioController");
 const ExclusaoController = require("../controllers/exclusaoController");
+const LoginController = require("../controllers/loginController");
+const PedidoController = require("../controllers/pedidoController");
 
 const router = express.Router();
 
@@ -20,6 +22,8 @@ let administrador = new AdministradorController();
 let fornecedor = new FornecedorController();
 let socio = new SocioController();
 let exclusao = new ExclusaoController();
+let login = new LoginController();
+let pedido = new PedidoController();
 
 //paginas do site
 router.get("/", home.indexView);
@@ -33,6 +37,16 @@ router.get("/cart", home.cartView);
 router.get("/cadastro", home.cadastroView);
 router.get("/usuario/cadastrar", home.cadastroView);
 router.get("/adm", home.admView);
+
+//login (temporario, sem sessao)
+router.post("/login", login.login);
+router.post("/administrador/login", login.loginAdministrador);
+router.get("/logout", login.logout);
+
+//pedido (carrinho): baixa o estoque e grava PEDIDOS + ITENS_PEDIDOS
+router.post("/pedido/finalizar", pedido.finalizar);
+router.get("/pedido/listar", pedido.listar);
+router.post("/pedido/status", pedido.alterarStatus);
 
 //produtos
 router.get("/products", produto.produtosView);
@@ -66,6 +80,7 @@ router.post("/fornecedor/cadastrar", fornecedor.cadastrar);
 router.post("/fornecedor/alterar", fornecedor.alterar);
 router.get("/socio/listar", socio.listar);
 router.post("/socio/cadastrar", socio.cadastrar);
+router.post("/socio/alterar", socio.alterar);
 
 router.delete("/usuario/excluir/:id", exclusao.excluirUsuario);
 router.delete("/administrador/excluir/:id", exclusao.excluirAdministrador);

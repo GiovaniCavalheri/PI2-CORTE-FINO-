@@ -353,6 +353,8 @@
 
       input[type="text"],
       input[type="number"],
+      input[type="email"],
+      input[type="date"],
       textarea,
       select {
         width: 100%;
@@ -958,4 +960,23 @@
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── PEDIDOS ── */
+.pedidos-ajuda {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 12px 0 0;
+}
+
+.itens-pedido {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+}
+
+.select-status {
+  min-width: 190px;
+  padding: 6px 10px;
+  font-size: 13px;
 }

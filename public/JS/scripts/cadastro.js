@@ -54,9 +54,14 @@ function mRG(input) {
 }
 
 function mTel(input) {
-  let v = input.value.replace(/\D/g, "");
-  v = v.replace(/^(\d{2})(\d)/g, "($1)$2");
-  v = v.replace(/(\d{5})(\d)/, "$1-$2");
+  // fixo: (99)9999-9999 (10 digitos) / celular: (99)99999-9999 (11 digitos)
+  let v = input.value.replace(/\D/g, "").slice(0, 11);
+  if (v.length > 10) {
+    v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1)$2-$3");
+  } else {
+    v = v.replace(/^(\d{2})(\d)/, "($1)$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+  }
   input.value = v;
 }
 
@@ -112,6 +117,24 @@ function limparTodosErros(form) {
 }
 
 // ── VALIDAÇÕES REUTILIZÁVEIS ──────────────────────────────────
+
+// usado nos campos opcionais: só valida quando o usuário digitou algo
+function campoPreenchido(input) {
+  return input.value.trim() != "";
+}
+
+// Estado é opcional, mas se vier tem que ser a sigla (SP, RJ...)
+function validaEstadoOpcional(input) {
+  if (!campoPreenchido(input)) {
+    return true;
+  }
+  if (input.value.trim().length != 2) {
+    marcarErro(input, "Use a sigla do estado. Ex.: SP");
+    return false;
+  }
+  marcarValido(input);
+  return true;
+}
 
 function validaCampoVazio(input, mensagem) {
   if (input.value.trim() === "") {
@@ -353,50 +376,34 @@ async function validarCadastro(event, tipoForm) {
 
     if (!validaCPF(document.querySelector("#CPF"))) valido = false;
 
-    // RG: mínimo 8 dígitos
-    let inputRG = document.querySelector("#RG");
-    if (inputRG.value.replace(/\D/g, "").length < 8) {
-      marcarErro(inputRG, "RG incompleto.");
-      valido = false;
-    } else {
-      marcarValido(inputRG);
-    }
-
-
     if (!validaEmail(document.querySelector("#emailSocio"))) valido = false;
     if (!validaTelefone(document.querySelector("#CelularSocio")))
       valido = false;
-    if (!validaTelefone(document.querySelector("#TelefoneSocio")))
-      valido = false;
-    if (!validaCEP(document.querySelector("#CEPSocio"))) valido = false;
 
-    if (
-      !validaCampoVazio(
-        document.querySelector("#CidadeSocio"),
-        "Informe a cidade.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#EstadoSocio"),
-        "Informe o estado.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#BairroSocio"),
-        "Informe o bairro.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#numberRedSocio"),
-        "Informe o número.",
-      )
-    )
+    // ── OPCIONAIS: só confere se o campo foi preenchido ──
+
+    // RG: mínimo 8 dígitos
+    let inputRG = document.querySelector("#RG");
+    if (campoPreenchido(inputRG)) {
+      if (inputRG.value.replace(/\D/g, "").length < 8) {
+        marcarErro(inputRG, "RG incompleto.");
+        valido = false;
+      } else {
+        marcarValido(inputRG);
+      }
+    }
+
+    let inputTelefoneSocio = document.querySelector("#TelefoneSocio");
+    if (campoPreenchido(inputTelefoneSocio)) {
+      if (!validaTelefone(inputTelefoneSocio)) valido = false;
+    }
+
+    let inputCEPSocio = document.querySelector("#CEPSocio");
+    if (campoPreenchido(inputCEPSocio)) {
+      if (!validaCEP(inputCEPSocio)) valido = false;
+    }
+
+    if (!validaEstadoOpcional(document.querySelector("#EstadoSocio")))
       valido = false;
 
     if (
@@ -426,69 +433,50 @@ async function validarCadastro(event, tipoForm) {
       marcarValido(inputRazao);
     }
 
-    if (
-      !validaCampoVazio(
-        document.querySelector("#fantasyname"),
-        "Informe o nome fantasia.",
-      )
-    )
-      valido = false;
     if (!validaCNPJ(document.querySelector("#CNPJ"))) valido = false;
-
-    // Nome do Responsável: mínimo 2 palavras
-    let inputResp = document.querySelector("#nameFornecedor");
-    if (inputResp.value.trim() === "") {
-      marcarErro(inputResp, "Informe o nome do responsável.");
-      valido = false;
-    } else if (
-      inputResp.value
-        .trim()
-        .split(" ")
-        .filter(function (p) {
-          return p;
-        }).length < 2
-    ) {
-      marcarErro(inputResp, "Informe nome e sobrenome do responsável.");
-      valido = false;
-    } else {
-      marcarValido(inputResp);
-    }
-
-    if (!validaCPF(document.querySelector("#CPFFornecedor"))) valido = false;
     if (!validaEmail(document.querySelector("#emailFornecedor")))
-      valido = false;
-    if (!validaTelefone(document.querySelector("#TelefoneComercialFornecedor")))
       valido = false;
     if (!validaTelefone(document.querySelector("#CelularFornecedor")))
       valido = false;
-    if (!validaCEP(document.querySelector("#CEPFornecedor"))) valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#CidadeFornecedor"),
-        "Informe a cidade.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#EstadoFornecedor"),
-        "Informe o estado.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#BairroFornecedor"),
-        "Informe o bairro.",
-      )
-    )
-      valido = false;
-    if (
-      !validaCampoVazio(
-        document.querySelector("#numberRedFornecedor"),
-        "Informe o número.",
-      )
-    )
+
+    // ── OPCIONAIS: só confere se o campo foi preenchido ──
+
+    // Nome do Responsável: mínimo 2 palavras
+    let inputResp = document.querySelector("#nameFornecedor");
+    if (campoPreenchido(inputResp)) {
+      if (
+        inputResp.value
+          .trim()
+          .split(" ")
+          .filter(function (p) {
+            return p;
+          }).length < 2
+      ) {
+        marcarErro(inputResp, "Informe nome e sobrenome do responsável.");
+        valido = false;
+      } else {
+        marcarValido(inputResp);
+      }
+    }
+
+    let inputCPFFornecedor = document.querySelector("#CPFFornecedor");
+    if (campoPreenchido(inputCPFFornecedor)) {
+      if (!validaCPF(inputCPFFornecedor)) valido = false;
+    }
+
+    let inputTelefoneFornecedor = document.querySelector(
+      "#TelefoneComercialFornecedor",
+    );
+    if (campoPreenchido(inputTelefoneFornecedor)) {
+      if (!validaTelefone(inputTelefoneFornecedor)) valido = false;
+    }
+
+    let inputCEPFornecedor = document.querySelector("#CEPFornecedor");
+    if (campoPreenchido(inputCEPFornecedor)) {
+      if (!validaCEP(inputCEPFornecedor)) valido = false;
+    }
+
+    if (!validaEstadoOpcional(document.querySelector("#EstadoFornecedor")))
       valido = false;
 
     // Forma de pagamento: obrigatória
@@ -521,20 +509,20 @@ async function enviarCadastro(tipoForm) {
   try {
     if (tipoForm === "socio") {
       const usuario = {
+        nomeCliente: document.querySelector("#nameSocio").value.trim(),
+        dataNascimento: document.querySelector("#nascimento").value,
         cpfCliente: document.querySelector("#CPF").value.trim(),
+        rgCliente: document.querySelector("#RG").value.trim(),
         emailCliente: document.querySelector("#emailSocio").value.trim(),
-        enderecoCliente: [
-          document.querySelector("#BairroSocio").value.trim(),
-          document.querySelector("#CidadeSocio").value.trim(),
-          document.querySelector("#EstadoSocio").value.trim(),
-          document.querySelector("#CEPSocio").value.trim(),
-          document.querySelector("#numberRedSocio").value.trim(),
-          document.querySelector("#ComplementoSocio").value.trim(),
-        ]
-          .filter(Boolean)
-          .join(", "),
         telefone: document.querySelector("#CelularSocio").value.trim(),
         telComercial: document.querySelector("#TelefoneSocio").value.trim(),
+        cep: document.querySelector("#CEPSocio").value.trim(),
+        cidade: document.querySelector("#CidadeSocio").value.trim(),
+        estado: document.querySelector("#EstadoSocio").value.trim(),
+        bairro: document.querySelector("#BairroSocio").value.trim(),
+        numero: document.querySelector("#numberRedSocio").value.trim(),
+        complemento: document.querySelector("#ComplementoSocio").value.trim(),
+        senhaCliente: document.querySelector("#senhaSocio").value,
       };
 
       const cadastroUsuario = await enviarJson("/usuario/cadastrar", usuario);
@@ -574,12 +562,27 @@ async function enviarCadastro(tipoForm) {
       const resultado = await enviarJson("/fornecedor/cadastrar", {
         cnpjFornecedor: document.querySelector("#CNPJ").value.trim(),
         nomeFornecedor: document.querySelector("#razaosocial").value.trim(),
+        nomeFantasia: document.querySelector("#fantasyname").value.trim(),
+        nomeResponsavel: document
+          .querySelector("#nameFornecedor")
+          .value.trim(),
+        cpfResponsavel: document.querySelector("#CPFFornecedor").value.trim(),
         emailFornecedor: document
           .querySelector("#emailFornecedor")
           .value.trim(),
         telefone: document
           .querySelector("#TelefoneComercialFornecedor")
           .value.trim(),
+        celular: document.querySelector("#CelularFornecedor").value.trim(),
+        cep: document.querySelector("#CEPFornecedor").value.trim(),
+        cidade: document.querySelector("#CidadeFornecedor").value.trim(),
+        estado: document.querySelector("#EstadoFornecedor").value.trim(),
+        bairro: document.querySelector("#BairroFornecedor").value.trim(),
+        numero: document.querySelector("#numberRedFornecedor").value.trim(),
+        formaPagamento: document.querySelector(
+          "#formFornecedor input[name='pagamento']:checked",
+        ).value,
+        senhaFornecedor: document.querySelector("#senhaFornecedor").value,
       });
       if (!resultado.ok) {
         throw new Error("Não foi possível cadastrar o fornecedor.");
@@ -608,7 +611,8 @@ async function enviarJson(url, dados) {
     body: JSON.stringify(dados),
   });
   if (!resposta.ok) {
-    throw new Error(`Falha na requisição (${resposta.status}).`);
+    const corpo = await resposta.json().catch(() => ({}));
+    throw new Error(corpo.erro || `Falha na requisição (${resposta.status}).`);
   }
   return resposta.json();
 }

@@ -14,8 +14,8 @@ const STATUS_PEDIDO = [
 class PedidoController {
   async finalizar(req, res) {
 
-    let usuario = res.locals.usuarioLogado;
-    if (usuario == null || usuario.tipo != "socio" || !Number.isInteger(usuario.id)) {
+    let idCliente = req.body.idCliente;
+    if (!idCliente || idCliente <= 0) {
       res.send({
         ok: false,
         precisaLogin: true,
@@ -23,6 +23,7 @@ class PedidoController {
       });
       return;
     }
+
 
     let itens = req.body.itens;
     if (!Array.isArray(itens) || itens.length == 0) {
@@ -62,7 +63,7 @@ class PedidoController {
       totalItens = totalItens + quantidade;
     }
 
-    let resultado = await new Pedidos().finalizar(usuario.id, lista);
+    let resultado = await new Pedidos().finalizar(idCliente, lista);
 
     if (resultado.ok) {
       res.send({

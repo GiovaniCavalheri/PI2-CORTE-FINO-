@@ -4,7 +4,7 @@ const Fornecedor = require("../models/fornecedorModel");
 
 //TEMPORARIO: compara a senha em texto puro; o login do site so grava um
 //cookie com id/nome/tipo para o header mostrar o nome (nao e uma sessao segura)
-const DURACAO_COOKIE = 1000 * 60 * 60 * 8; //8 horas
+//const DURACAO_COOKIE = 1000 * 60 * 60 * 8; //8 horas
 
 //true se e-mail e senha vieram preenchidos
 function credenciaisValidas(email, senha) {
@@ -56,7 +56,6 @@ class LoginController {
           nome: clientes[i].nomeCliente,
           tipo: "socio",
         };
-        res.cookie("usuario", usuario, { maxAge: DURACAO_COOKIE, sameSite: "lax" });
         res.send({ ok: true, id: usuario.id, nome: usuario.nome, tipo: usuario.tipo });
         return;
       }
@@ -71,7 +70,6 @@ class LoginController {
           nome: fornecedores[i].nomeFornecedor,
           tipo: "fornecedor",
         };
-        res.cookie("usuario", usuario, { maxAge: DURACAO_COOKIE, sameSite: "lax" });
         res.send({ ok: true, id: usuario.id, nome: usuario.nome, tipo: usuario.tipo });
         return;
       }
@@ -80,10 +78,10 @@ class LoginController {
     res.send({ ok: false });
   }
 
-  logout(req, res) {
-    res.clearCookie("usuario");
-    res.redirect("/");
-  }
+  //logout(req, res) {
+    //res.clearCookie("usuario");
+    //res.redirect("/");
+  //}
 }
 
 module.exports = LoginController;

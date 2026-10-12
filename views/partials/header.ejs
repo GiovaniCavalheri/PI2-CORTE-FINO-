@@ -61,18 +61,15 @@
             Carrinho <span class="contador-carrinho" id="contadorCarrinho" hidden>0</span>
           </a>
         </li>
-        <% if (locals.usuarioLogado) { %>
-        <li class="nav-item d-flex align-items-center">
-          <span class="nav-link destaque-vermelho usuario-logado" title="<%= usuarioLogado.nome %>">
-            <i class="fa-solid fa-user"></i> <%= usuarioLogado.nome.split(" ")[0] %>
+        <li class="nav-item d-flex align-items-center" id="menuUsuario" hidden>
+          <span class="nav-link destaque-vermelho usuario-logado" id="nomeUsuario">
+            <i class="fa-solid fa-user"></i> <span id="primeiroNome"></span>
           </span>
-          <a href="/logout" class="nav-link link-sair">Sair</a>
+          <a href="#" class="nav-link link-sair" id="btnSair">Sair</a>
         </li>
-        <% } else { %>
-        <li class="nav-item">
+        <li class="nav-item" id="menuEntrar">
           <a href="/join" class="nav-link destaque-vermelho <%= currentPage === 'join' || currentPage === 'cadastro' || currentPage === 'adm' ? 'active' : '' %>">Entrar</a>
         </li>
-        <% } %>
       </ul>
     </div>
   </div>
@@ -93,5 +90,25 @@
     contador.hidden = total === 0;
   };
   window.atualizarContadorCarrinho();
+
+  //mostra o nome do usuario logado (guardado no login pelo join.js)
+  let usuarioSalvo = localStorage.getItem("usuario_corte_fino");
+  if (usuarioSalvo != null) {
+    let usuario = JSON.parse(usuarioSalvo);
+    document.querySelector("#primeiroNome").textContent = usuario.nome.split(" ")[0];
+    document.querySelector("#nomeUsuario").title = usuario.nome;
+    document.querySelector("#menuUsuario").hidden = false;
+    document.querySelector("#menuEntrar").hidden = true;
+  }
+
+  document.querySelector("#btnSair").addEventListener("click", sair);
+
+  function sair(e) {
+    e.preventDefault();
+    localStorage.removeItem("usuario_corte_fino");
+    window.location.href = "/";
+  }
+
+
 </script>
 <% } %>

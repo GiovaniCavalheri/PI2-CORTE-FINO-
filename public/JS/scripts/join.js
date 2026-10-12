@@ -34,6 +34,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }).then(function(CorpoResposta) {
             botao.disabled = false;
             if(CorpoResposta.ok) {
+                
+                //guarda o usuario logado no navegador (igual o carrinho)
+                let usuario = {
+                    id: CorpoResposta.id,
+                    nome: CorpoResposta.nome,
+                    tipo: CorpoResposta.tipo
+                };
+                localStorage.setItem("usuario_corte_fino", JSON.stringify(usuario));
+
                 //CorpoResposta.tipo diz de qual tabela veio o login: "socio" ou "fornecedor"
                 alert("Bem-vindo, " + CorpoResposta.nome + "!");
                 window.location.href = paginaDeDestino();

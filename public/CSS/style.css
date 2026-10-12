@@ -751,7 +751,12 @@
 }
 
 .card-login {
-  background: #ffffff;
+  display: inline-block;
+  width: auto;
+  vertical-align: top;
+  background: linear-gradient(180deg, #ffffff 0%, #f7efe6 100%);
+  border: 1px solid var(--cor-bege-borda);
+  box-shadow: 0 10px 30px rgba(46, 26, 22, 0.15);
 }
 
 .titulo-login {

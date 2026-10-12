@@ -103,7 +103,7 @@ function montarCliente(id, body, senha) {
 class UsuarioController {
   async cadastrar(req, res) {
     let senha = null;
-    if (typeof req.body.senhaCliente == "string") {
+    if (typeof req.body.senhaCliente === "string") {
       senha = req.body.senhaCliente;
     }
 

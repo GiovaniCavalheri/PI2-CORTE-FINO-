@@ -50,6 +50,54 @@
       .grupo-radio {
         margin-bottom: 12px;
       }
+
+      /* ===== QUADRO DE CADASTRO (layout em colunas) ===== */
+      .container-login {
+        width: 100%;
+        max-width: 1040px;
+      }
+
+      .card-cadastro {
+        width: 100%;
+        max-width: 1000px;
+      }
+
+      .login-logo {
+        width: auto !important;
+        max-width: 220px;
+      }
+
+      .form-cadastro {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0 20px;
+      }
+
+      @media (min-width: 576px) {
+        .form-cadastro {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 992px) {
+        .form-cadastro {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* campos que ocupam a linha inteira */
+      .form-cadastro .campo-largo {
+        grid-column: 1 / -1;
+      }
+
+      /* uniformiza o espacamento dos campos dentro do grid */
+      .form-cadastro .form-control {
+        margin-bottom: 1rem !important;
+      }
+
+      .form-cadastro .mb-3 > .form-control {
+        margin-bottom: 0 !important;
+      }
     </style>
   </head>
 
@@ -69,8 +117,7 @@
         />
 
         <div
-          class="card-login shadow p-4 rounded mx-auto"
-          style="max-width: 420px"
+          class="card-login card-cadastro shadow p-4 rounded mx-auto"
         >
           <h2 class="titulo-login fw-bold fs-4">Cadastre-se</h2>
 
@@ -100,7 +147,7 @@
           <!-- FORMULÁRIO SÓCIO -->
           <form
             id="formSocio"
-            class="text-start"
+            class="text-start form-cadastro"
             novalidate
             onsubmit="validarCadastro(event, 'socio')"
           >
@@ -282,8 +329,7 @@
 
             <div>
               <label for="senhaSocio" class="form-label">Senha</label>
-
-              <div class="mb-3">
+             <div class="mb-3">
                 <input
                   type="password"
                   id="senhaSocio"
@@ -316,7 +362,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-login btn w-100 mt-2">
+            <button type="submit" class="btn-login btn w-100 mt-2 campo-largo">
               Cadastrar-se
             </button>
           </form>
@@ -324,7 +370,7 @@
           <!-- FORMULÁRIO FORNECEDOR -->
           <form
             id="formFornecedor"
-            class="text-start"
+            class="text-start form-cadastro"
             style="display: none"
             novalidate
             onsubmit="validarCadastro(event, 'fornecedor')"
@@ -511,7 +557,7 @@
               </div>
             </div>
 
-            <div class="grupo-radio mb-3">
+            <div class="grupo-radio campo-largo mb-3">
               <label class="form-label d-block"
                 >Forma de Pagamento Aceita</label
               >
@@ -595,7 +641,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-login btn w-100 mt-2">
+            <button type="submit" class="btn-login btn w-100 mt-2 campo-largo">
               Cadastrar-se
             </button>
           </form>

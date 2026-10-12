@@ -1,6 +1,5 @@
 const Administrador = require("../models/administradorModel");
 
-//true se o valor for um texto que nao esta vazio
 function textoPreenchido(valor) {
   return typeof valor == "string" && valor.trim() != "";
 }

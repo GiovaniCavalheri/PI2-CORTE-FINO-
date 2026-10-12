@@ -5,11 +5,11 @@ function mostrarForm(qual) {
   let btnFornecedor = document.querySelector("#btnFornecedor");
 
   if (qual === "socio") {
-    formSocio.style.display = "block";
+    formSocio.style.display = "grid";
     formFornecedor.style.display = "none";
   } else {
     formSocio.style.display = "none";
-    formFornecedor.style.display = "block";
+    formFornecedor.style.display = "grid";
   }
 
   btnSocio.style.cssText =

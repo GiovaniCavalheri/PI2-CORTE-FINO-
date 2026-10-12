@@ -799,6 +799,9 @@
             if (!socio.ok) {
               throw new Error(socio.erro || "O servidor não excluiu o sócio.");
             }
+
+            alert("Sócio Excluido com Sucesso!!");
+
             await carregarListas();
           } catch (erro) {
             alert("Erro ao excluir o sócio: " + erro.message);
@@ -980,6 +983,9 @@
                 resultado.erro || "O servidor não excluiu o fornecedor.",
               );
             }
+
+            alert("Fornecedor Excluido com Sucesso!");
+
             await carregarListas();
           } catch (erro) {
             alert("Erro ao excluir o fornecedor: " + erro.message);

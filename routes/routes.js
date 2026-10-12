@@ -41,7 +41,7 @@ router.get("/adm", home.admView);
 //login (temporario, sem sessao)
 router.post("/login", login.login);
 router.post("/administrador/login", login.loginAdministrador);
-router.get("/logout", login.logout);
+//router.get("/logout", login.logout);
 
 //pedido (carrinho): baixa o estoque e grava PEDIDOS + ITENS_PEDIDOS
 router.post("/pedido/finalizar", pedido.finalizar);

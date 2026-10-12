@@ -684,6 +684,14 @@
         const itens = lerCarrinho();
         if (itens.length === 0) return;
 
+        //pega o socio que fez login (guardado pelo join.js)
+        let usuarioSalvo = localStorage.getItem("usuario_corte_fino");
+        let idCliente = 0;
+        if (usuarioSalvo != null) {
+          idCliente = JSON.parse(usuarioSalvo).id;
+        }
+
+
         const botao = document.getElementById("btn-finalizar");
         botao.disabled = true;
         botao.textContent = "Enviando...";
@@ -697,6 +705,7 @@
                 idProduto: item.idProduto,
                 quantidade: item.quantidade,
               })),
+              idCliente: idCliente,
             }),
           });
           const resultado = await resposta.json();
